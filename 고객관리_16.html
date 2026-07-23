@@ -700,6 +700,7 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
     <button id="at0" class="btn btn-primary btn-sm" onclick="setATab(0)">광고변동확인</button>
     <button id="at1" class="btn btn-ghost btn-sm" onclick="setATab(1)">이편한광고</button>
     <button id="at2" class="btn btn-ghost btn-sm" onclick="setATab(2)">써밋광고</button>
+    <button id="at3" class="btn btn-ghost btn-sm" onclick="setATab(3)">광고비교분석</button>
     <span style="margin-left:auto;display:flex;gap:6px;align-items:center;">
       <input id="aSearch" type="text" placeholder="🔍 통합검색..." oninput="renderAdvert()"
         style="padding:6px 10px;border:1.5px solid #dde1ec;border-radius:7px;font-size:11px;font-family:inherit;width:150px;">
@@ -714,7 +715,8 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
   <div id="aColFilters" style="position:sticky;top:0;z-index:25;background:#fff3ee;border:1px solid #ffd4b8;border-radius:8px;padding:6px 10px;margin-bottom:8px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-height:36px;"></div>
   <!-- 테이블 -->
   <div style="background:#fff;border:1px solid #dde1ec;border-radius:12px;overflow:auto;max-height:calc(100vh - 240px);">
-    <table style="width:max-content;min-width:100%;border-collapse:collapse;font-size:13px;">
+    <table id="aTableEl" style="width:auto;border-collapse:collapse;font-size:13px;table-layout:fixed;">
+      <colgroup id="aColgroup"></colgroup>
       <thead id="aThead"></thead>
       <tbody id="aTbody"></tbody>
     </table>
@@ -1834,7 +1836,8 @@ var MP3 = [{"danji": "이편한", "gubun": "전세", "priority": "1", "pyung": "
 // MP4, MP5 → window._realDataFn 에서 초기화
 var MP6=[{dong:'6101',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6102',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6103',mNav:'2',mOur:'2',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6104',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6105',mNav:'2',mOur:'0',mDiff:'-2',mRooms:'1602',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6106',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6107',mNav:'7',mOur:'3',mDiff:'-4',mRooms:'402',jNav:'1',jOur:'0',jDiff:'-1',wNav:'0',wOur:'0',wDiff:''},{dong:'6108',mNav:'1',mOur:'0',mDiff:'-1',mRooms:'101',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6109',mNav:'3',mOur:'3',mDiff:'',mRooms:'',jNav:'1',jOur:'1',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6110',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6111',mNav:'3',mOur:'2',mDiff:'-1',mRooms:'403',jNav:'1',jOur:'1',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6112',mNav:'1',mOur:'0',mDiff:'-1',mRooms:'2802',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6113',mNav:'0',mOur:'0',mDiff:'',mRooms:'',jNav:'1',jOur:'0',jDiff:'-1',wNav:'0',wOur:'0',wDiff:''},{dong:'6114',mNav:'5',mOur:'4',mDiff:'-1',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6115',mNav:'2',mOur:'2',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'2',wOur:'2',wDiff:''},{dong:'6116',mNav:'2',mOur:'1',mDiff:'-1',mRooms:'2303',jNav:'1',jOur:'1',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6117',mNav:'7',mOur:'6',mDiff:'-1',mRooms:'2803',jNav:'1',jOur:'1',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6118',mNav:'2',mOur:'2',mDiff:'',mRooms:'',jNav:'1',jOur:'1',jDiff:'',wNav:'1',wOur:'1',wDiff:''},{dong:'6119',mNav:'1',mOur:'1',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6120',mNav:'1',mOur:'1',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6121',mNav:'9',mOur:'4',mDiff:'-5',mRooms:'503',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'6122',mNav:'1',mOur:'1',mDiff:'',mRooms:'',jNav:'0',jOur:'0',jDiff:'',wNav:'0',wOur:'0',wDiff:''},{dong:'총 합계',mNav:'49',mOur:'32',mDiff:'-17',mRooms:'',jNav:'7',jOur:'5',jDiff:'-2',wNav:'3',wOur:'3',wDiff:''}];
 var MP7=[{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'금호부동산중개법인 주식회사'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'금호부동산중개법인주식회사'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6111동',level:'고/39',ho:'3502',adCnt:'6',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'5/37',ho:'502',adCnt:'6',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'5/37',ho:'502',adCnt:'6',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'저/37',ho:'502',adCnt:'6',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'5/37',ho:'502',adCnt:'6',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'5/37',ho:'502',adCnt:'6',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6117동',level:'5/37',ho:'502',adCnt:'6',owner:'집주인',agency:'자연앤힐스테이트203-2003(단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6107동',level:'2/37',ho:'204',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6107동',level:'2/37',ho:'204',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6107동',level:'2/37',ho:'204',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6107동',level:'2/37',ho:'204',adCnt:'5',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6107동',level:'2/37',ho:'204',adCnt:'5',owner:'집주인',agency:'리치공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6109동',level:'33/35',ho:'3303',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6109동',level:'33/35',ho:'3303',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6109동',level:'고/35',ho:'3303',adCnt:'5',owner:'집주인',agency:'광교힐스테이트공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6109동',level:'33/35',ho:'3303',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6109동',level:'33/35',ho:'3303',adCnt:'5',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'6만',rent:'200',dong:'6118동',level:'33/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'6만',rent:'200',dong:'6118동',level:'고/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'광교오드사랑(단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'6만',rent:'200',dong:'6118동',level:'고/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'6만',rent:'200',dong:'6118동',level:'고/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'6만',rent:'200',dong:'6118동',level:'고/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6118동',level:'33/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6118동',level:'33/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'광교오드사랑(단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6118동',level:'고/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6118동',level:'33/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6118동',level:'33/37',ho:'3302',adCnt:'5',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6119동',level:'중/37',ho:'1303',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6119동',level:'중/37',ho:'1303',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6119동',level:'중/37',ho:'1303',adCnt:'5',owner:'집주인',agency:'광교자연앤힐스(단지내)로얄공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6119동',level:'중/37',ho:'1303',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6119동',level:'중/37',ho:'1303',adCnt:'5',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'고/34',ho:'2602',adCnt:'5',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'고/34',ho:'2602',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'고/34',ho:'2602',adCnt:'5',owner:'집주인',agency:'광교힐스테이트공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'고/34',ho:'2602',adCnt:'5',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'26/34',ho:'2602',adCnt:'5',owner:'',agency:'이재리버하임공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'저/36',ho:'601',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'저/36',ho:'601',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'저/36',ho:'601',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'저/36',ho:'601',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'1801',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'1801',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'1801',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'1801',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'1801',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'2601',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'2601',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'중/39',ho:'2601',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'26/39',ho:'2603',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'26/39',ho:'2603',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'중/39',ho:'2603',adCnt:'4',owner:'집주인',agency:'광교자연앤힐스(단지내)로얄공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'중/39',ho:'2603',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'중/28',ho:'1102',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'중/28',ho:'1102',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'중/28',ho:'1102',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'중/28',ho:'1102',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'고/28',ho:'2501',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'고/28',ho:'2501',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'고/28',ho:'2501',adCnt:'4',owner:'집주인',agency:'광교중흥희망공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6115동',level:'고/28',ho:'2501',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'8만',rent:'200',dong:'6115동',level:'중/28',ho:'1501',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'8만',rent:'200',dong:'6115동',level:'중/28',ho:'1501',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'8만',rent:'200',dong:'6115동',level:'중/28',ho:'1501',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'8만',rent:'200',dong:'6115동',level:'중/28',ho:'1501',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6116동',level:'중/37',ho:'2403',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6116동',level:'중/37',ho:'2403',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6116동',level:'중/37',ho:'2403',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6116동',level:'중/37',ho:'2403',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6116동',level:'중/37',ho:'1902',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6116동',level:'중/37',ho:'1902',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6116동',level:'중/37',ho:'1902',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6116동',level:'중/37',ho:'1902',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'저/37',ho:'304',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'저/37',ho:'304',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'저/37',ho:'304',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'저/37',ho:'304',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'더샵탑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'2202',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'2202',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'2202',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6117동',level:'중/37',ho:'2202',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6117동',level:'고/37',ho:'2503',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6117동',level:'고/37',ho:'2503',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6117동',level:'고/37',ho:'2503',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6117동',level:'고/37',ho:'2503',adCnt:'4',owner:'집주인',agency:'호반프라임부동산공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6118동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6118동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6118동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6118동',level:'중/37',ho:'1302',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6118동',level:'고/37',ho:'2901',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6118동',level:'고/37',ho:'2901',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6118동',level:'고/37',ho:'2901',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6118동',level:'고/37',ho:'2901',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6120동',level:'2026-01-15 00:00:00',ho:'101',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6120동',level:'2026-01-15 00:00:00',ho:'101',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6120동',level:'2026-01-15 00:00:00',ho:'101',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6120동',level:'2026-01-15 00:00:00',ho:'101',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6121동',level:'중/34',ho:'2202',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'25만',rent:'0',dong:'6121동',level:'중/34',ho:'2202',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'25만',rent:'0',dong:'6121동',level:'중/34',ho:'2202',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'25만',rent:'0',dong:'6121동',level:'중/34',ho:'2202',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'39만',rent:'0',dong:'6121동',level:'고/34',ho:'3404',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'39만',rent:'0',dong:'6121동',level:'고/34',ho:'3404',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'39만',rent:'0',dong:'6121동',level:'고/34',ho:'3404',adCnt:'4',owner:'집주인',agency:'광교중흥탑212-0277공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'39만',rent:'0',dong:'6121동',level:'고/34',ho:'3404',adCnt:'4',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6122동',level:'고/15',ho:'1303',adCnt:'4',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6122동',level:'고/15',ho:'1303',adCnt:'4',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6122동',level:'고/15',ho:'1303',adCnt:'4',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6122동',level:'고/15',ho:'1303',adCnt:'4',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'저/37',ho:'503',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'저/37',ho:'503',adCnt:'3',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'저/37',ho:'503',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'고/37',ho:'3202',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'고/37',ho:'3202',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6107동',level:'고/37',ho:'3202',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6108동',level:'2026-01-10 00:00:00',ho:'101',adCnt:'3',owner:'집주인',agency:'광교입장힐스공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6108동',level:'2026-01-10 00:00:00',ho:'101',adCnt:'3',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'18만',rent:'0',dong:'6108동',level:'2026-01-10 00:00:00',ho:'101',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6109동',level:'저/35',ho:'304',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6109동',level:'저/35',ho:'304',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6109동',level:'저/35',ho:'304',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6111동',level:'34/39',ho:'3401',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6111동',level:'34/39',ho:'3401',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6111동',level:'34/39',ho:'3401',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'고/39',ho:'3801',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'고/39',ho:'3801',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6114동',level:'고/39',ho:'3801',adCnt:'3',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'1만',rent:'380',dong:'6115동',level:'저/28',ho:'402',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'1만',rent:'380',dong:'6115동',level:'저/28',ho:'402',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'1만',rent:'380',dong:'6115동',level:'저/28',ho:'402',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'고/37',ho:'2804',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'고/37',ho:'2804',adCnt:'3',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6117동',level:'고/37',ho:'2804',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6121동',level:'저/34',ho:'1003',adCnt:'3',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6121동',level:'저/34',ho:'1003',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6121동',level:'저/34',ho:'1003',adCnt:'3',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'8/36',ho:'802',adCnt:'2',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6103동',level:'8/36',ho:'802',adCnt:'2',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6107동',level:'저/37',ho:'402',adCnt:'2',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6107동',level:'저/37',ho:'402',adCnt:'2',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6111동',level:'저/39',ho:'403',adCnt:'2',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6111동',level:'저/39',ho:'403',adCnt:'2',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'1만',rent:'380',dong:'6114동',level:'고/39',ho:'3801',adCnt:'2',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'1만',rent:'380',dong:'6114동',level:'고/39',ho:'3801',adCnt:'2',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6117동',level:'중/37',ho:'1403',adCnt:'2',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6117동',level:'중/37',ho:'1403',adCnt:'2',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'25만',rent:'0',dong:'6121동',level:'저/34',ho:'503',adCnt:'2',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'25만',rent:'0',dong:'6121동',level:'저/34',ho:'503',adCnt:'2',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6121동',level:'고/34',ho:'2303',adCnt:'2',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6121동',level:'고/34',ho:'2303',adCnt:'2',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6116동',level:'23/37',ho:'2303',adCnt:'1',owner:'집주인',agency:'공114공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6112동',level:'고/38',ho:'2802',adCnt:'1',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'19만',rent:'0',dong:'6105동',level:'중/23',ho:'1103',adCnt:'1',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6109동',level:'6/35',ho:'601',adCnt:'1',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6111동',level:'저/39',ho:'1104',adCnt:'1',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'7만',rent:'160',dong:'6107동',level:'저/37',ho:'101',adCnt:'1',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6107동',level:'저/37',ho:'101',adCnt:'1',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'26만',rent:'0',dong:'6121동',level:'고/34',ho:'3203',adCnt:'1',owner:'집주인',agency:'광교자연앤힐스(단지내)로얄공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'11만',rent:'0',dong:'6109동',level:'중/35',ho:'1902',adCnt:'1',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'20만',rent:'0',dong:'6117동',level:'고/37',ho:'2803',adCnt:'1',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6105동',level:'고/23',ho:'1602',adCnt:'1',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'전세',price:'12만',rent:'0',dong:'6113동',level:'30/39',ho:'3001',adCnt:'1',owner:'집주인',agency:'샘터공인중개사사무소'},{date:'2026-05-12',gubun:'단기임대',price:'1만',rent:'380',dong:'6114동',level:'고/39',ho:'3801',adCnt:'1',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'26만',rent:'0',dong:'6107동',level:'저/37',ho:'901',adCnt:'1',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'21만',rent:'0',dong:'6107동',level:'중/37',ho:'2101',adCnt:'1',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'22만',rent:'0',dong:'6114동',level:'고/39',ho:'2803',adCnt:'1',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'월세',price:'3만',rent:'320',dong:'6118동',level:'중/37',ho:'1702',adCnt:'1',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6121동',level:'고/34',ho:'2302',adCnt:'1',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'23만',rent:'0',dong:'6107동',level:'저/37',ho:'1204',adCnt:'1',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-05-12',gubun:'매매',price:'24만',rent:'0',dong:'6121동',level:'중/34',ho:'1803',adCnt:'1',owner:'집주인',agency:'e편한세상광교공인중개사사무소'}];
-var MP8=[{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'광교최강공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'7',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'22.5억',rent:'',dong:'101동',level:'고/29',ho:'2101호',adCnt:'1',owner:'-',agency:'성수공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'21.5억',rent:'',dong:'102동',level:'중/24',ho:'1202호',adCnt:'2',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'21.5억',rent:'',dong:'102동',level:'중/24',ho:'1202호',adCnt:'2',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'102동',level:'저/24',ho:'603호',adCnt:'3',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'102동',level:'저/24',ho:'603호',adCnt:'3',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'102동',level:'저/24',ho:'603호',adCnt:'3',owner:'집주인',agency:'자연앤힐스테이트203-2003(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'중/29',ho:'1101호',adCnt:'2',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'중/29',ho:'1101호',adCnt:'2',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'15/29',ho:'1501호',adCnt:'4',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'중/29',ho:'1501호',adCnt:'4',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'15/29',ho:'1501호',adCnt:'4',owner:'집주인',agency:'광교중흥탑212-0277공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'중/29',ho:'1501호',adCnt:'4',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'고/29',ho:'2201호',adCnt:'1',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'20.0억',rent:'',dong:'103동',level:'저/29',ho:'302호',adCnt:'1',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'2026-05-29 00:00:00',ho:'502호',adCnt:'5',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'저/29',ho:'502호',adCnt:'5',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'저/29',ho:'502호',adCnt:'5',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'2026-05-29 00:00:00',ho:'502호',adCnt:'5',owner:'집주인',agency:'광교최강공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'103동',level:'저/29',ho:'502호',adCnt:'5',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교로뎀공인'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'',agency:'광교리츠공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교부부공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교스마트공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교아이파크더샵건대공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'광교중흥지구촌공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'',agency:'뉴포스원공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'더샵공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'문명 공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'저/29',ho:'701호',adCnt:'19',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'자연앤힐스테이트203-2003(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'중흥단지내하나(213-8999)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'판교88공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'집주인',agency:'판교88공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-07-29 00:00:00',ho:'701호',adCnt:'19',owner:'',agency:'희망공인중개사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-09-29 00:00:00',ho:'904호',adCnt:'6',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.7억',rent:'',dong:'103동',level:'저/29',ho:'904호',adCnt:'6',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-09-29 00:00:00',ho:'904호',adCnt:'6',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-09-29 00:00:00',ho:'904호',adCnt:'6',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'2026-09-29 00:00:00',ho:'904호',adCnt:'6',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'103동',level:'저/29',ho:'904호',adCnt:'6',owner:'집주인',agency:'자연앤힐스테이트203-2003(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'2026-11-29 00:00:00',ho:'1101호',adCnt:'6',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'2026-11-29 00:00:00',ho:'1101호',adCnt:'6',owner:'집주인',agency:'광교더힐스(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'2026-11-29 00:00:00',ho:'1101호',adCnt:'6',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'중/29',ho:'1101호',adCnt:'6',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'2026-11-29 00:00:00',ho:'1101호',adCnt:'6',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'104동',level:'중/29',ho:'1101호',adCnt:'6',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'21.0억',rent:'',dong:'104동',level:'중/29',ho:'1104호',adCnt:'1',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'104동',level:'17/29',ho:'1702호',adCnt:'3',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'104동',level:'중/29',ho:'1702호',adCnt:'3',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.3억',rent:'',dong:'104동',level:'17/29',ho:'1702호',adCnt:'3',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'24/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'고/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'고/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'고/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'광교중흥탑212-0277공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'고/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'광교힐스테이트공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'104동',level:'고/29',ho:'2401호',adCnt:'6',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'18.9억',rent:'',dong:'105동',level:'중/29',ho:'1102호',adCnt:'1',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'광교더힐스(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'고/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'고/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'광교자연앤힐스단지내탑공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'광교힐스테이트공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'고/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'고/29',ho:'2903호',adCnt:'9',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'매매',price:'19.0억',rent:'',dong:'106동',level:'중/11',ho:'401호',adCnt:'1',owner:'집주인',agency:'광교입장힐스공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'101동',level:'고/29',ho:'2703호',adCnt:'3',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'101동',level:'고/29',ho:'2703호',adCnt:'3',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'101동',level:'고/29',ho:'2703호',adCnt:'3',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'13/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'e편한세상광교공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교삼성래미안공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'13/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교써밋공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'13/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교에듀포레공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'13/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교오드카운티(213-9300)공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교입장힐스공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'광교최강공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'13/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'대림사랑공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'더샵김수원공인중개사사무소'},{date:'2026-04-29',gubun:'전세',price:'11.5억',rent:'',dong:'105동',level:'중/29',ho:'1303호',adCnt:'13',owner:'집주인',agency:'써밋단지내공인중개사사무소'}];
+var MP8=[{date:'2026-07-08',gubun:'매매',price:'19.5억',rent:'',dong:'105동',level:'29/29',ho:'2903호',adCnt:'8',owner:'집주인',agency:'광교더힐스(단지내)공인중개사사무소'},{date:'2026-07-08',gubun:'매매',price:'23.5억',rent:'',dong:'105동',level:'저/29',ho:'502호',adCnt:'1',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-07-08',gubun:'매매',price:'20.5억',rent:'',dong:'101동',level:'중/29',ho:'1101호',adCnt:'4',owner:'집주인',agency:'써밋단지내공인중개사사무소'},{date:'2026-07-08',gubun:'전세',price:'12억',rent:'',dong:'104동',level:'저/29',ho:'401호',adCnt:'1',owner:'',agency:'써밋단지내공인중개사사무소'},{date:'2026-07-07',gubun:'매매',price:'20.5억',rent:'',dong:'104동',level:'11/29',ho:'1101호',adCnt:'5',owner:'집주인',agency:'광교더힐스(단지내)공인중개사사무소'},{date:'2026-07-07',gubun:'매매',price:'20억',rent:'',dong:'103동',level:'5/29',ho:'502호',adCnt:'4',owner:'집주인',agency:'광교최강공인중개사사무소'},{date:'2026-07-07',gubun:'매매',price:'20억',rent:'',dong:'102동',level:'중/24',ho:'1202호',adCnt:'2',owner:'집주인',agency:'광교이편한세상(031-8050-7777)공인중개사사무소'},{date:'2026-07-01',gubun:'매매',price:'23억',rent:'',dong:'103동',level:'7/29',ho:'701호',adCnt:'6',owner:'집주인',agency:'자연앤힐스테이트203-2003(단지내)공인중개사사무소'},{date:'2026-06-18',gubun:'매매',price:'22억',rent:'',dong:'103동',level:'고/29',ho:'2201호',adCnt:'1',owner:'집주인',agency:'광교秀수(단지내)공인중개사사무소'},{date:'2026-06-15',gubun:'매매',price:'23.5억',rent:'',dong:'101동',level:'고/29',ho:'2101호',adCnt:'1',owner:'',agency:'성수공인중개사사무소'}];
+var MP9=[{date:'2026-06-26',dong:'6107동',ho:'204호',gubun:'매매',eok:'21억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6107동',ho:'603호',gubun:'매매',eok:'23억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-23',dong:'6107동',ho:'604호',gubun:'매매',eok:'22억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'불통'},{date:'2026-06-16',dong:'6107동',ho:'901호',gubun:'매매',eok:'26억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'불통'},{date:'2026-06-19',dong:'6107동',ho:'3101호',gubun:'매매',eok:'23억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'불통'},{date:'2026-06-26',dong:'6107동',ho:'3202호',gubun:'매매',eok:'23억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6107동',ho:'3302호',gubun:'매매',eok:'24.5억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6107동',ho:'3601호',gubun:'매매',eok:'27억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6108동',ho:'101호',gubun:'매매',eok:'19억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'전화거절'},{date:'2026-06-26',dong:'6109동',ho:'304호',gubun:'매매',eok:'22.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-09',dong:'6111동',ho:'301호',gubun:'매매',eok:'25억',rent:'',agency:'마루공인중개사',status:'타사만',note:'공동중개 지인부동산'},{date:'2026-06-26',dong:'6111동',ho:'603호',gubun:'매매',eok:'26.5억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6111동',ho:'1104호',gubun:'매매',eok:'24억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6111동',ho:'3201호',gubun:'매매',eok:'27.5억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6112동',ho:'1503호',gubun:'매매',eok:'22.5억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6112동',ho:'2802호',gubun:'매매',eok:'21.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'우리도 있음'},{date:'2026-06-26',dong:'6114동',ho:'2603호',gubun:'매매',eok:'23억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6114동',ho:'2703호',gubun:'매매',eok:'24억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-12',dong:'6114동',ho:'2803호',gubun:'매매',eok:'25억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'매매안한다고 함'},{date:'2026-06-26',dong:'6114동',ho:'3801호',gubun:'매매',eok:'25억',rent:'',agency:'광교대림사랑공인중개사사무소',status:'타사만',note:'매매보류한다고 광고내려달라고 하셨음'},{date:'2026-06-26',dong:'6115동',ho:'1102호',gubun:'매매',eok:'25억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6115동',ho:'2501호',gubun:'매매',eok:'22.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6116동',ho:'303호',gubun:'매매',eok:'23.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-12',dong:'6116동',ho:'2303호',gubun:'매매',eok:'22억',rent:'',agency:'공114공인중개사사무소',status:'타사만',note:'공114'},{date:'2026-06-26',dong:'6116동',ho:'2403호',gubun:'매매',eok:'22억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6117동',ho:'304호',gubun:'매매',eok:'21억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6117동',ho:'502호',gubun:'매매',eok:'24억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6117동',ho:'1302호',gubun:'매매',eok:'23억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6117동',ho:'2202호',gubun:'매매',eok:'23억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6118동',ho:'1302호',gubun:'매매',eok:'21.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6119동',ho:'3403호',gubun:'매매',eok:'22억',rent:'',agency:'e편한세상광교공인중개사사무소',status:'타사만',note:'우리도 있는매물_우리는광고안하고 있음'},{date:'2026-06-26',dong:'6120동',ho:'101호',gubun:'매매',eok:'21억',rent:'',agency:'e편한세상광교공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6121동',ho:'503호',gubun:'매매',eok:'25억',rent:'',agency:'광교대림사랑공인중개사사무소',status:'타사만',note:'광교랑 대림사랑만 광고'},{date:'2026-06-26',dong:'6121동',ho:'1803호',gubun:'매매',eok:'24억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6121동',ho:'2202호',gubun:'매매',eok:'25억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6121동',ho:'2302호',gubun:'매매',eok:'23억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6121동',ho:'2602호',gubun:'매매',eok:'25억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-20',dong:'6121동',ho:'3203호',gubun:'매매',eok:'26.5억',rent:'',agency:'광교자연앤힐스(단지내)로얄공인중개사사무소',status:'타사만',note:'입주민소통방'},{date:'2026-06-26',dong:'6121동',ho:'3404호',gubun:'매매',eok:'39.5억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6122동',ho:'1303호',gubun:'매매',eok:'22.5억',rent:'',agency:'광교대림사랑공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6107동',ho:'101호',gubun:'전세',eok:'11억',rent:'',agency:'e편한세상광교공인중개사사무소',status:'타사만',note:'불통'},{date:'2026-06-26',dong:'6109동',ho:'1902호',gubun:'전세',eok:'12억',rent:'',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6113동',ho:'301호',gubun:'전세',eok:'12.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'타사만',note:'전세완료(26.01~28.01)'},{date:'2026-06-26',dong:'6113동',ho:'3001호',gubun:'전세',eok:'12억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6115동',ho:'1501호',gubun:'전세',eok:'12.5억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6116동',ho:'401호',gubun:'전세',eok:'14억',rent:'',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6121동',ho:'1101호',gubun:'전세',eok:'12억',rent:'',agency:'e편한세상광교공인중개사사무소',status:'타사만',note:'불통'},{date:'2026-06-26',dong:'6115동',ho:'402호',gubun:'월세',eok:'1억',rent:'380',agency:'대림스카이(e편한세상 정문 단지내)공인중개사사무소',status:'우리+타사',note:''},{date:'2026-06-26',dong:'6115동',ho:'1501호',gubun:'월세',eok:'8억',rent:'180',agency:'-',status:'우리만',note:''},{date:'2026-06-26',dong:'6121동',ho:'1101호',gubun:'월세',eok:'9억',rent:'130',agency:'e편한세상광교공인중개사사무소',status:'타사만',note:'불통'}];
 
 // ── MAEMUL JS ──
 
@@ -3168,6 +3171,7 @@ function saveReal(){
   buildRColFilters();
   renderReal();
   showToast('✅ 저장되었습니다');
+  saveRealToFirebase();
 }
 
 function delReal(){
@@ -3568,11 +3572,11 @@ let aSortDir = 1;
 let aColFilters = {};
 let aOpenFilter = null;
 
-function getAData(){ return [MP6,MP7,MP8][aTab]||[]; }
+function getAData(){ return [MP6,MP7,MP8,MP9][aTab]||[]; }
 
 function setATab(t){
   aTab=t; aSortKey=''; aSortDir=1; aColFilters={}; aOpenFilter=null;
-  for(let i=0;i<3;i++){
+  for(let i=0;i<4;i++){
     const b=document.getElementById('at'+i);
     if(b) b.className=i===t?'btn btn-primary btn-sm':'btn btn-ghost btn-sm';
   }
@@ -3586,6 +3590,18 @@ function getACols(){
     {key:'mNav',label:'매매 네이버',w:'65px'},{key:'mOur',label:'매매 당소',w:'60px'},{key:'mDiff',label:'변동',w:'45px'},
     {key:'jNav',label:'전세 네이버',w:'65px'},{key:'jOur',label:'전세 당소',w:'60px'},{key:'jDiff',label:'변동',w:'45px'},
     {key:'wNav',label:'월세 네이버',w:'65px'},{key:'wOur',label:'월세 당소',w:'60px'},{key:'wDiff',label:'변동',w:'45px'},
+    {key:'changeDate',label:'변동일',w:'120px'},
+  ];
+  if(aTab===3) return [ // 광고비교분석 (우리 vs 타사)
+    {key:'date',label:'등록일',w:'80px'},
+    {key:'dong',label:'동',w:'62px'},
+    {key:'ho',label:'호',w:'58px'},
+    {key:'gubun',label:'구분',w:'45px'},
+    {key:'eok',label:'금액',w:'70px',align:'right'},
+    {key:'rent',label:'차임',w:'48px'},
+    {key:'agency',label:'등록부동산(타사)',w:'200px',align:'left'},
+    {key:'status',label:'우리광고여부',w:'100px'},
+    {key:'note',label:'메모',w:'180px',align:'left'},
   ];
   return [ // 이편한광고, 써밋광고
     {key:'date',label:'날짜',w:'82px'},
@@ -3602,33 +3618,170 @@ function getACols(){
 }
 
 function buildAColFilters(){
-  const data=getAData(), cols=getACols();
+  // 매물장/고객관리와 동일한 방식(컬럼 헤더의 ▼ 클릭 → 체크박스 다중선택 드롭다운)으로 대체되어
+  // 상단 select 바는 더 이상 사용하지 않고 숨김 처리.
   const bar=document.getElementById('aColFilters');
   if(!bar) return;
-  aColFilters={};
-  bar.innerHTML='<span style="font-size:11px;font-weight:700;color:#ff6b2b;white-space:nowrap;">필터:</span>';
-  cols.forEach(col=>{
-    const vals=[...new Set(data.map(r=>(r[col.key]||'')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
-    if(vals.length<2) return;
-    const sel=document.createElement('select');
-    // 스타일은 CSS #rColFilters select 에서 처리
-    sel.innerHTML=`<option value="">${col.label} ▼</option>`+vals.map(v=>`<option value="${v}">${col.key==='pyung'?parseFloat(v).toFixed(1):v}</option>`).join('');
-    sel.onchange=()=>{aColFilters[col.key]=sel.value;renderAdvert();};
-    bar.appendChild(sel);
+  bar.innerHTML='';
+  bar.style.display='none';
+}
+
+// ── 광고 탭 컬럼 너비 저장/복원 + 드래그 리사이즈 (매물장과 동일 패턴) ──
+function _aColKey(){ return 'aColWidths_'+(currentUser?currentUser.manager:'ALL')+'_'+aTab; }
+function getAColWidths(){
+  try{ return JSON.parse(localStorage.getItem(_aColKey())||'{}'); }catch(e){return {};}
+}
+function saveAColWidth(key, w){
+  try{
+    const d=getAColWidths(); d[key]=w;
+    localStorage.setItem(_aColKey(), JSON.stringify(d));
+  }catch(e){}
+}
+let aResizing=null;
+function startAColResize(e, key){
+  e.stopPropagation(); e.preventDefault();
+  const col=document.getElementById('acol_'+key);
+  if(!col) return;
+  const startX=e.clientX;
+  const startW=parseInt(col.style.width) || col.offsetWidth || 80;
+  aResizing={key, startX, startW};
+
+  const onMove=ev=>{
+    if(!aResizing) return;
+    const newW=Math.max(40, aResizing.startW+(ev.clientX-aResizing.startX));
+    const c=document.getElementById('acol_'+aResizing.key);
+    if(c){ c.style.width=newW+'px'; }
+  };
+  const onUp=ev=>{
+    if(!aResizing) return;
+    const newW=Math.max(40, aResizing.startW+(ev.clientX-aResizing.startX));
+    saveAColWidth(aResizing.key, newW);
+    aResizing=null;
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+  };
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+// ── 광고 탭 컬럼 필터 드롭다운 (매물장과 동일한 체크박스 다중선택 방식) ──
+function aSort(key){
+  if(aSortKey===key) aSortDir*=-1; else { aSortKey=key; aSortDir=1; }
+  closeAFilterDD();
+  renderAdvert();
+}
+
+function toggleAFilterDD(key, btnEl){
+  if(aOpenFilter===key){ closeAFilterDD(); return; }
+  closeAFilterDD();
+  aOpenFilter=key;
+
+  const data=getAData();
+  const allVals=[...new Set(data.map(r=>(r[key]||'')))].sort((a,b)=>a.localeCompare(b,'ko'));
+  const selected=aColFilters[key]||new Set(allVals.map(String));
+
+  const dd=document.createElement('div');
+  dd.id='aFilterDD';
+  dd.style.cssText=`position:fixed;z-index:9999;background:#fff;border:1px solid #dde1ec;border-radius:10px;
+    box-shadow:0 8px 30px rgba(0,0,0,.15);min-width:200px;padding:10px 0;font-size:12px;`;
+
+  const rect=btnEl.getBoundingClientRect();
+  dd.style.left=Math.min(rect.left, window.innerWidth-220)+'px';
+  dd.style.top=(rect.bottom+4)+'px';
+
+  dd.innerHTML=`
+    <div style="padding:4px 14px;display:flex;gap:6px;border-bottom:1px solid #f0f2f7;margin-bottom:6px;padding-bottom:8px;">
+      <button onclick="aSortKey='${key}';aSortDir=1;renderAdvert();closeAFilterDD();" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↑ 오름차순</button>
+      <button onclick="aSortKey='${key}';aSortDir=-1;renderAdvert();closeAFilterDD();" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↓ 내림차순</button>
+    </div>
+    <div style="padding:4px 14px 6px;border-bottom:1px solid #f0f2f7;">
+      <input id="aFSearchInput" type="text" placeholder="🔍 검색..." oninput="filterADDSearch('${key}')"
+        style="width:100%;padding:5px 8px;border:1.5px solid #dde1ec;border-radius:6px;font-size:11px;font-family:inherit;box-sizing:border-box;">
+    </div>
+    <div style="padding:5px 14px;border-bottom:1px solid #f0f2f7;display:flex;gap:10px;">
+      <span onclick="selectAllADD('${key}',true)" style="color:#ff6b2b;cursor:pointer;font-size:11px;font-weight:600;">모두 선택</span>
+      <span onclick="selectAllADD('${key}',false)" style="color:#6b7280;cursor:pointer;font-size:11px;">모두 해제</span>
+    </div>
+    <div id="aFDDList" style="max-height:220px;overflow-y:auto;padding:4px 0;">
+      ${allVals.map(v=>`
+        <label style="display:flex;align-items:center;gap:8px;padding:5px 14px;cursor:pointer;">
+          <input type="checkbox" data-val="${v}" ${selected.has(String(v))||selected.size===0?'checked':''}
+            onchange="toggleADDVal('${key}','${v}',this.checked)" style="accent-color:#ff6b2b;width:14px;height:14px;">
+          <span>${v||'(공백)'}</span>
+        </label>`).join('')}
+    </div>
+    <div style="padding:8px 14px;border-top:1px solid #f0f2f7;display:flex;gap:6px;justify-content:flex-end;">
+      <button onclick="closeAFilterDD()" style="padding:5px 14px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">취소</button>
+      <button onclick="applyAFilterDD('${key}')" style="padding:5px 14px;border:none;border-radius:6px;background:#ff6b2b;color:#fff;font-size:11px;cursor:pointer;font-family:inherit;font-weight:700;">확인</button>
+    </div>`;
+
+  document.body.appendChild(dd);
+  dd._tempSelected = new Set(selected);
+
+  setTimeout(()=>{
+    document.addEventListener('click', outsideAFilterClick, true);
+  }, 100);
+}
+
+function outsideAFilterClick(e){
+  const dd=document.getElementById('aFilterDD');
+  if(dd && !dd.contains(e.target) && !e.target.closest('.a-filter-btn')){
+    closeAFilterDD();
+  }
+}
+
+function closeAFilterDD(){
+  const dd=document.getElementById('aFilterDD');
+  if(dd) dd.remove();
+  aOpenFilter=null;
+  document.removeEventListener('click', outsideAFilterClick, true);
+}
+
+function filterADDSearch(key){
+  const q=(document.getElementById('aFSearchInput')||{}).value?.toLowerCase()||'';
+  const items=document.querySelectorAll('#aFDDList label');
+  items.forEach(el=>{
+    const txt=el.querySelector('span').textContent.toLowerCase();
+    el.style.display=txt.includes(q)?'':'none';
   });
-  const reset=document.createElement('button');
-  reset.textContent='✕ 초기화'; reset.className='btn btn-ghost btn-sm';
-  reset.style.cssText='font-size:10px;padding:3px 8px;margin-left:4px;';
-  reset.onclick=()=>{aColFilters={};document.getElementById('aSearch').value='';buildAColFilters();renderAdvert();};
-  bar.appendChild(reset);
+}
+
+function toggleADDVal(key, val, checked){
+  const dd=document.getElementById('aFilterDD');
+  if(!dd) return;
+  if(!dd._tempSelected) dd._tempSelected=new Set();
+  if(checked) dd._tempSelected.add(val);
+  else dd._tempSelected.delete(val);
+}
+
+function selectAllADD(key, all){
+  const data=getAData();
+  const allVals=[...new Set(data.map(r=>(r[key]||'')))].map(String);
+  const dd=document.getElementById('aFilterDD');
+  if(!dd) return;
+  dd._tempSelected = all ? new Set(allVals) : new Set();
+  const cbs=dd.querySelectorAll('input[type=checkbox]');
+  cbs.forEach(cb=>cb.checked=all);
+}
+
+function applyAFilterDD(key){
+  const dd=document.getElementById('aFilterDD');
+  if(!dd) return;
+  const data=getAData();
+  const allVals=new Set(data.map(r=>String(r[key]||'')));
+  const sel=dd._tempSelected||new Set();
+  if(sel.size===0||sel.size===allVals.size) delete aColFilters[key];
+  else aColFilters[key]=sel;
+  closeAFilterDD();
+  renderAdvert();
 }
 
 function renderAdvert(){
   const q=(document.getElementById('aSearch')||{}).value?.toLowerCase()||'';
   let rows=getAData().filter(r=>{
     if(q && !Object.values(r).join(' ').toLowerCase().includes(q)) return false;
-    for(const [k,v] of Object.entries(aColFilters)){
-      if(v && (r[k]||'')!==v) return false;
+    for(const [k,vSet] of Object.entries(aColFilters)){
+      if(vSet && vSet.size>0 && !vSet.has(String(r[k]||''))) return false;
     }
     return true;
   });
@@ -3648,13 +3801,34 @@ function renderAdvert(){
 
   const cols=getACols();
   const thBase=`padding:9px 8px;background:#ff6b2b;color:#fff;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:100;border-right:1px solid rgba(255,255,255,.15);cursor:pointer;`;
-  const TD=(align,extra)=>`padding:7px 8px;border-bottom:1px solid #f0f2f7;text-align:${align||'center'};vertical-align:middle;white-space:nowrap;${extra||''}`;
+  const TD=(align,extra)=>`padding:7px 8px;border-bottom:1px solid #f0f2f7;text-align:${align||'center'};vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${extra||''}`;
+  const savedAW=getAColWidths();
+
+  const colgroupEl=document.getElementById('aColgroup');
+  if(colgroupEl){
+    colgroupEl.innerHTML=cols.map(c=>{
+      const w=savedAW[c.key]?savedAW[c.key]+'px':c.w;
+      return `<col id="acol_${c.key}" style="width:${w};">`;
+    }).join('');
+  }
 
   thead.innerHTML='<tr>'+cols.map(c=>{
     const arr=aSortKey===c.key?(aSortDir>0?' ↑':' ↓'):'';
-    const hasF=aColFilters[c.key]&&aColFilters[c.key].length>0;
-    return `<th onclick="aSortKey='${c.key}';aSortDir*=-1;if(aSortKey!=='${c.key}') aSortDir=1;renderAdvert();"
-      style="${thBase}text-align:${c.align||'center'};min-width:${c.w};">${c.label}${arr}</th>`;
+    const hasF=aColFilters[c.key]&&aColFilters[c.key].size>0;
+    const fIcon=hasF?'🔽':'▼';
+    const fColor=hasF?'#ffe066':'rgba(255,255,255,.7)';
+    const w=savedAW[c.key]?savedAW[c.key]+'px':c.w;
+    return `<th id="ath_${c.key}" style="${thBase}text-align:center;position:relative;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;overflow:hidden;">
+        <span onclick="aSort('${c.key}')" style="cursor:pointer;flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center;">${c.label}${arr}</span>
+        <span class="a-filter-btn" onclick="event.stopPropagation();toggleAFilterDD('${c.key}',this)"
+          style="color:${fColor};cursor:pointer;font-size:10px;padding:1px 3px;border-radius:3px;
+          background:${hasF?'rgba(0,0,0,.2)':'rgba(0,0,0,.1)'};white-space:nowrap;flex-shrink:0;">${fIcon}</span>
+      </div>
+      <div onmousedown="startAColResize(event,'${c.key}')"
+        style="position:absolute;right:0;top:0;bottom:0;width:5px;cursor:col-resize;background:transparent;z-index:10;"
+        title="드래그하여 너비 조절"></div>
+    </th>`;
   }).join('')+'</tr>';
 
   tbody.innerHTML=rows.map(r=>{
@@ -3663,10 +3837,23 @@ function renderAdvert(){
       let style=TD(c.align||'center');
       let content=val;
       if(c.key==='gubun') content=`<span style="background:${val==='매매'?'#fef3c7':'#dbeafe'};padding:2px 5px;border-radius:4px;font-size:10px;font-weight:700">${val}</span>`;
-      else if(c.key==='price') style=TD('right','font-weight:700;color:#ff6b2b;');
+      else if(c.key==='price'||c.key==='eok') style=TD('right','font-weight:700;color:#ff6b2b;');
       else if(c.key==='agency') style=TD('left','font-size:13px;color:#1a1d2e;');
       else if(['mDiff','jDiff','wDiff'].includes(c.key)){const n=parseInt(val);content=`<span style="color:${n>0?'#dc2626':n<0?'#16a34a':'#6b7280'};font-weight:${n!==0?700:400}">${val}</span>`;}
+      else if(aTab===0 && c.key==='changeDate'){
+        style=TD('center','padding:4px 6px;');
+        const rIdx=getAData().indexOf(r);
+        content=`<input type="date" value="${val&&/^\d{4}-\d{2}-\d{2}$/.test(val)?val:''}"
+          onchange="MP6[${rIdx}]['changeDate']=this.value;saveAdvertToFirebase();"
+          style="width:100%;border:1px solid #dde1ec;border-radius:5px;padding:3px 4px;font-family:inherit;font-size:11px;color:#1a1d2e;">`;
+      }
       else if(c.key==='dong'&&aTab===0) style=TD('center','font-weight:700;');
+      else if(c.key==='status'&&aTab===3){
+        const sMap={'우리+타사':{bg:'#dcfce7',fg:'#15803d',icon:'✅'},'우리만':{bg:'#dbeafe',fg:'#1d4ed8',icon:'✅'},'타사만':{bg:'#fee2e2',fg:'#dc2626',icon:'❌'}};
+        const s=sMap[val]||{bg:'#f3f4f6',fg:'#6b7280',icon:''};
+        content=`<span style="background:${s.bg};color:${s.fg};padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;">${s.icon} ${val}</span>`;
+      }
+      else if(c.key==='note'&&aTab===3) style=TD('left','font-size:12px;color:#6b7280;');
       return `<td style="${style}">${content}</td>`;
     }).join('');
     return `<tr onmouseover="this.style.background='#fff8f5'" onmouseout="this.style.background=''">${cells}</tr>`;
@@ -3945,6 +4132,45 @@ async function saveRealToFirebase(){
   }
 }
 
+// ── 광고 탭(MP6~MP9) Firebase 저장/로드 ──
+window._advertLoaded = false;
+function loadAdvertData(cb){
+  if(window._advertLoaded){ if(cb) cb(); return; }
+  if(typeof db !== 'undefined'){
+    Promise.all([
+      db.collection('advertData').doc('mp6').get(),
+      db.collection('advertData').doc('mp7').get(),
+      db.collection('advertData').doc('mp8').get(),
+      db.collection('advertData').doc('mp9').get(),
+    ]).then(([d6,d7,d8,d9])=>{
+      try{ if(d6.exists && d6.data().json) MP6.splice(0,MP6.length,...JSON.parse(d6.data().json)); }catch(e){}
+      try{ if(d7.exists && d7.data().json) MP7.splice(0,MP7.length,...JSON.parse(d7.data().json)); }catch(e){}
+      try{ if(d8.exists && d8.data().json) MP8.splice(0,MP8.length,...JSON.parse(d8.data().json)); }catch(e){}
+      try{ if(d9.exists && d9.data().json) MP9.splice(0,MP9.length,...JSON.parse(d9.data().json)); }catch(e){}
+      window._advertLoaded = true;
+      if(cb) cb();
+    }).catch(()=>{ window._advertLoaded = true; if(cb) cb(); });
+  } else {
+    window._advertLoaded = true;
+    if(cb) cb();
+  }
+}
+async function saveAdvertToFirebase(){
+  if(typeof db === 'undefined') return;
+  try {
+    await Promise.all([
+      db.collection('advertData').doc('mp6').set({json: JSON.stringify(MP6)}),
+      db.collection('advertData').doc('mp7').set({json: JSON.stringify(MP7)}),
+      db.collection('advertData').doc('mp8').set({json: JSON.stringify(MP8)}),
+      db.collection('advertData').doc('mp9').set({json: JSON.stringify(MP9)}),
+    ]);
+    showToast('✅ 저장 완료');
+  } catch(e) {
+    console.error('광고 Firebase 저장 오류:', e);
+    showToast('❌ 저장 실패! 네트워크를 확인하세요', 'error', 4000);
+  }
+}
+
 function downloadReal(){
   const data = getRData();
   if(!data.length){ alert('다운로드할 데이터가 없습니다.'); return; }
@@ -4026,6 +4252,7 @@ function uploadAdvert(input) {
     if(!confirm(`${parsed.length}건을 불러옵니다. 교체할까요?`)) return;
     [MP6,MP7,MP8][aTab].splice(0,[MP6,MP7,MP8][aTab].length,...parsed);
     renderAdvert();
+    saveAdvertToFirebase();
     alert(`✅ ${parsed.length}건 반영 완료!`);
   });
   input.value='';
@@ -4146,7 +4373,7 @@ function switchTab(tab) {
   } else if(tab === 'maemul') {
     loadMaemulFromFirebase().then(()=>{ ensureMaemulNo(); setMTab(mTab||0); renderMaemul(); });
   } else if(tab === 'advert') {
-    setATab(aTab||0);
+    loadAdvertData(()=>{ setATab(aTab||0); });
   } else if(tab === 'real') {
     setRTab(rTab||0);
   } else if(tab === 'elevation') {
@@ -4853,22 +5080,12 @@ function renderElevation(){
         total++;
         const key = dong+'-'+cell.ho;
         const info = statusMap[key];
-        let bgCss = 'background:#fff;', textColor = '#333';
-        let title = `${dong} ${cell.ho}호 (${cell.type||''}, ${fl}층) — 클릭해서 상태 수정`;
-        if(info){
-          counts[info.status]++;
-          title += ' | ' + ELEV_LABEL[info.status] + ' | ' + info.detail;
-          if(info.status === '재계약'){
-            bgCss = 'background:repeating-linear-gradient(45deg, #fff, #fff 3px, #99f6e4 3px, #99f6e4 6px);';
-            textColor = '#0f766e';
-          } else {
-            bgCss = 'background:' + (ELEV_COLOR[info.status]||'#fff') + ';';
-            textColor = '#fff';
-          }
-        } else { vacant++; }
+        let bg = '#fff', title = `${dong} ${cell.ho}호 (${cell.type||''}, ${fl}층) — 클릭해서 상태 수정`;
+        if(info){ bg = ELEV_COLOR[info.status]||'#fff'; counts[info.status]++; title += ' | ' + ELEV_LABEL[info.status] + ' | ' + info.detail; }
+        else { vacant++; }
         const cellWidth = 40*span + (span-1); // 병합 시 테두리만큼 보정
         const txt = isPH ? cell.ho : cell.ho;
-        t += `<td colspan="${span}" data-dong="${dong}" data-ho="${cell.ho}" data-type="${cell.type||''}" data-floor="${fl}" title="${title.replace(/"/g,'&quot;')}" style="width:${cellWidth}px;height:22px;border:1px solid #eee;text-align:center;${bgCss}color:${textColor};font-weight:${info?700:400};cursor:pointer;white-space:nowrap;font-size:9.5px;">${txt}</td>`;
+        t += `<td colspan="${span}" data-dong="${dong}" data-ho="${cell.ho}" data-type="${cell.type||''}" data-floor="${fl}" title="${title.replace(/"/g,'&quot;')}" style="width:${cellWidth}px;height:22px;border:1px solid #eee;text-align:center;background:${bg};color:${info?'#fff':'#333'};font-weight:${info?700:400};cursor:pointer;white-space:nowrap;font-size:9.5px;">${txt}</td>`;
 
         i += mergeNext ? 2 : 1;
       }
@@ -4912,11 +5129,7 @@ function renderElevation(){
 
   let legend = '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center;">';
   Object.keys(ELEV_COLOR).forEach(k=>{
-    const swatchBg = k === '재계약'
-      ? 'repeating-linear-gradient(45deg, #fff, #fff 2px, #99f6e4 2px, #99f6e4 4px)'
-      : ELEV_COLOR[k];
-    const swatchBorder = k === '재계약' ? 'border:1px solid #5eead4;' : '';
-    legend += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;"><span style="width:14px;height:14px;background:${swatchBg};${swatchBorder}border-radius:3px;display:inline-block;"></span>${ELEV_LABEL[k]} (${counts[k]}세대)</span>`;
+    legend += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;"><span style="width:14px;height:14px;background:${ELEV_COLOR[k]};border-radius:3px;display:inline-block;"></span>${ELEV_LABEL[k]} (${counts[k]}세대)</span>`;
   });
   legend += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;"><span style="width:14px;height:14px;background:#fff;border:1px solid #ccc;border-radius:3px;display:inline-block;"></span>공실/미확인 (${vacant}세대)</span>`;
   legend += `<span style="margin-left:auto;font-size:11px;color:#6b7280;">전체 ${total}세대 · 셀을 클릭하면 상태를 직접 수정할 수 있습니다</span>`;
