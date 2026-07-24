@@ -4970,6 +4970,7 @@ async function _elevSaveOverrides(){
 function _elevBuildStatusMap(){
   const map = {};
   const setIfEmpty = (key, status, detail) => { if(key && !map[key]) map[key] = {status, detail}; };
+  const completedRentalKeys = new Set(); // 전월세 tradeBiz에 '완료'가 포함된 세대 (매매 진행중이면 매매색이 우선)
 
   (window.MP4||[]).forEach(r=>{
     const key = _elevKey(r.dong, r.ho);
@@ -4987,6 +4988,7 @@ function _elevBuildStatusMap(){
     const key = _elevKey(r.dong, r.ho);
     const st = _elevClassify(r.tradeBiz, '전월세');
     if(st) setIfEmpty(key, st, `전월세매물 ${r.tradeBiz||''} (${r._mno||''})`);
+    if(key && String(r.tradeBiz||'').includes('완료')) completedRentalKeys.add(key);
   });
 
   const listingMap = {}; // key -> '매매' | '전월세' (현재 매물장에 있는지)
@@ -5019,8 +5021,13 @@ function _elevBuildStatusMap(){
     const k=_elevKey(r.dong,r.ho); if(k && !listingMapFallback[k]) listingMapFallback[k] = '전월세';
   });
   Object.keys(listingMapFallback).forEach(key=>{
-    if(map[key]) return; // 이미 거래상태/오버라이드가 있으면 그대로 둠
     const kind = listingMapFallback[key]; // '매매' or '전월세'
+    if(map[key]){
+      // 전월세가 '완료'로 표시되어 있어도 매매가 진행중이면 매매(매물장) 색을 우선 표시
+      // (수동 설정/오버라이드는 절대 덮어쓰지 않음)
+      const canOverride = kind === '매매' && !map[key].manual && completedRentalKeys.has(key);
+      if(!canOverride) return;
+    }
     map[key] = {
       status: kind === '매매' ? '매물_매매' : '매물_전월세',
       detail: kind === '매매' ? '현재 매물장(매매)에 등록됨' : '현재 매물장(전월세)에 등록됨'
