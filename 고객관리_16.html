@@ -3196,52 +3196,67 @@ function closeRModal(){
 
 
 
-// ── 실거래가 타입별 평형 일괄보정 ──
-// 타입+현재평형 조합으로 정확한 평형 결정
-// 100m²계열(39평): A,B,C,D,E
-// 101m²계열(41평): F,G,H,I
-// 119m²계열(45평): A,B,C (단 현재평형이 45 근처)
-// 120m²계열(47평): D,E,F (단 현재평형이 47 근처)
-// 145m²계열(53평): A,B (단 현재평형이 53 근처)
-function getPyungByTypeAndCurrent(type, curPyung){
-  const t = (type||'').trim().toUpperCase();
-  const p = parseInt(curPyung) || 0;
-  // 현재 평형 기준으로 제곱미터 계열 판별
-  if(p >= 50) return '53'; // 145m² → 53평
-  if(p >= 44 && p <= 48){
-    // 119m²(45평) or 120m²(47평)
-    if(['A','B','C'].includes(t)) return '45';
-    if(['D','E','F'].includes(t)) return '47';
-    return p >= 46 ? '47' : '45';
+// ── 실거래가 동+타입 기준 평형 일괄보정 ──
+// 기존 방식(현재 평형 숫자대 + 타입 알파벳)만으로는 같은 타입 알파벳이 동마다
+// 다른 평형(예: F타입이 6112동은 41평, 6111동은 47평)으로 쓰이는 경우를 구분하지 못해
+// 잘못된 평형으로 보정될 위험이 있었음.
+// → 매물장(MP1 매매/MP3 전월세, 이편한 danji만)과 이미 정상 표기된 실거래 데이터에서
+//    "동+타입" 조합별로 실제 쓰이는 평형을 모아 참조표를 만들고, 그 참조표에 있는
+//    조합만 안전하게 보정한다. 참조 데이터가 없는 동+타입은 잘못 추정하지 않고 그대로 둔다.
+const RPYUNG_GOOD = ['39','41','45','47','53','73'];
+function buildPyungRefMap(){
+  const votes = {};
+  function add(dong, type, pyung){
+    const p = String(pyung||'').trim();
+    if(!RPYUNG_GOOD.includes(p)) return;
+    const d = String(dong||'').trim();
+    const t = String(type||'').trim().toUpperCase();
+    if(!d || d==='-' || !t) return;
+    const key = d+'_'+t;
+    if(!votes[key]) votes[key] = {};
+    votes[key][p] = (votes[key][p]||0) + 1;
   }
-  if(p >= 36 && p <= 42){
-    // 100m²(39평) or 101m²(41평)
-    if(['A','B','C','D','E'].includes(t)) return '39';
-    if(['F','G','H','I'].includes(t)) return '41';
-    return p >= 40 ? '41' : '39';
-  }
-  // 현재 평형 없거나 37평 등 이상한 경우 → 타입만으로 판별 불가, 기존값 유지
-  return null;
+  (window.MP1||[]).forEach(r=> r.danji==='이편한' && add(r.dong, r.type, r.pyung));
+  (window.MP3||[]).forEach(r=> r.danji==='이편한' && add(r.dong, r.type, r.pyung));
+  (window.MP4||[]).forEach(r=> add(r.dong, r.type, r.pyung));
+  (window.MP5||[]).forEach(r=> add(r.dong, r.type, r.pyung));
+
+  const resolved = {};
+  Object.keys(votes).forEach(key=>{
+    const vals = Object.keys(votes[key]);
+    if(vals.length === 1){ resolved[key] = vals[0]; return; }
+    // 동일 동+타입에 서로 다른 평형이 섞여있으면(드문 충돌), 더 많이 등장한 값 채택
+    let best=null, bestCount=-1;
+    vals.forEach(v=>{ if(votes[key][v] > bestCount){ best=v; bestCount=votes[key][v]; } });
+    resolved[key] = best;
+  });
+  return resolved;
 }
 
 function migrateRPyung(){
   if(!currentUser || currentUser.manager !== 'ALL'){
     alert('관리자만 사용 가능합니다.'); return;
   }
-  if(!confirm('타입+평형 조합으로 정확한 평형으로 일괄 보정합니다.\n100m²계열(A~E)→39평, 101m²계열(F~I)→41평\n119m²계열(A~C)→45평, 120m²계열(D~F)→47평\n145m²계열(A~B)→53평\n계속하시겠습니까?')) return;
+  if(!confirm('매물장(동+타입) 데이터와 대조하여 정확한 평형으로 일괄 보정합니다.\n매물장에 참고할 동+타입 조합이 없는 항목은 잘못 추정하지 않고 그대로 둡니다.\n계속하시겠습니까?')) return;
 
-  let count = 0;
+  const refMap = buildPyungRefMap();
+  let count = 0, skipped = 0;
   [window.MP4||[], window.MP5||[]].forEach(arr => {
     arr.forEach(r => {
-      const newP = getPyungByTypeAndCurrent(r.type, r.pyung);
-      if(newP && r.pyung !== newP){ r.pyung = newP; count++; }
+      const curP = String(r.pyung||'').trim();
+      if(RPYUNG_GOOD.includes(curP)) return; // 이미 정상 표기
+      const key = String(r.dong||'').trim() + '_' + String(r.type||'').trim().toUpperCase();
+      const newP = refMap[key];
+      if(newP){ r.pyung = newP; count++; }
+      else if(curP !== ''){ skipped++; }
     });
   });
 
   if(count === 0){ alert('변환할 항목이 없습니다.'); return; }
-  alert(`완료! ${count}건 평형 보정되었습니다.`);
+  alert(`완료! ${count}건 평형 보정되었습니다.` + (skipped>0 ? `\n(매물장에 참고 데이터가 없어 보정하지 못한 항목 ${skipped}건은 그대로 두었습니다)` : ''));
   buildRColFilters();
   renderReal();
+  saveRealToFirebase();
 }
 
 // ── 거래부동산 컬럼 숨김 토글 ──
