@@ -5004,10 +5004,23 @@ function _elevBuildStatusMap(){
     map[key] = {status: ov.status, detail: '수동 설정' + (ov.note ? (' - ' + ov.note) : ''), manual:true};
   });
 
-  // 거래상태가 없는(공실로 보이는) 유닛 중 현재 매물장에 등록된 건은 매물장 색상으로 표시
-  Object.keys(listingMap).forEach(key=>{
+  // 거래상태가 없는(공실로 보이는) 유닛 중, 매물장 우선순위 1/2/3/매예/추천 건만 매물장(매매/전월세) 색상으로 표시
+  // (거래부동산이 이미 명시된 건은 위 map 단계에서 이미 구체적 상태로 분류되어 여기 걸리지 않음)
+  const ELEV_PRIORITY_OK = new Set(['1','2','3','매예','추천']);
+  const listingMapFallback = {};
+  (window.MP1||[]).forEach(r=>{
+    if((r.danji||'')!=='이편한') return;
+    if(!ELEV_PRIORITY_OK.has(String(r.priority||'').trim())) return;
+    const k=_elevKey(r.dong,r.ho); if(k) listingMapFallback[k] = '매매';
+  });
+  (window.MP3||[]).forEach(r=>{
+    if((r.danji||'')!=='이편한') return;
+    if(!ELEV_PRIORITY_OK.has(String(r.priority||'').trim())) return;
+    const k=_elevKey(r.dong,r.ho); if(k && !listingMapFallback[k]) listingMapFallback[k] = '전월세';
+  });
+  Object.keys(listingMapFallback).forEach(key=>{
     if(map[key]) return; // 이미 거래상태/오버라이드가 있으면 그대로 둠
-    const kind = listingMap[key]; // '매매' or '전월세'
+    const kind = listingMapFallback[key]; // '매매' or '전월세'
     map[key] = {
       status: kind === '매매' ? '매물_매매' : '매물_전월세',
       detail: kind === '매매' ? '현재 매물장(매매)에 등록됨' : '현재 매물장(전월세)에 등록됨'
