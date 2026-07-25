@@ -4424,10 +4424,15 @@ function _statsCollectByManager(){
   const periods = [
     {key:'today', label:'오늘',   from: todayStr},
     {key:'d3',    label:'3일',    from: daysAgoStr(2)},
-    {key:'d10',   label:'10일',   from: daysAgoStr(9)},
+    {key:'d7',    label:'일주일', from: daysAgoStr(6)},
+    {key:'d15',   label:'15일',   from: daysAgoStr(14)},
     {key:'month', label:'이번달', from: monthStartStr},
     {key:'m1',    label:'1개월',  from: daysAgoStr(29)},
+    {key:'m2',    label:'2개월',  from: daysAgoStr(59)},
     {key:'m3',    label:'3개월',  from: daysAgoStr(89)},
+    {key:'m4',    label:'4개월',  from: daysAgoStr(119)},
+    {key:'m5',    label:'5개월',  from: daysAgoStr(149)},
+    {key:'m6',    label:'6개월',  from: daysAgoStr(179)},
   ];
 
   const managers = [...new Set(Object.keys(ACCOUNTS)
