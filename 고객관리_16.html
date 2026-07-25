@@ -597,7 +597,7 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
 <div id="statsScreen" style="display:none;padding:12px 16px;">
   <div style="display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
     <span style="font-size:14px;font-weight:700;color:#1a1d2e;">📊 직원별 업무 통계</span>
-    <span style="font-size:11px;color:#9ca3af;">고객관리(신규등록·통화이력) + 매물장(통화일) + 업무일지(작성건) 종합 · 관리자 전용</span>
+    <span style="font-size:11px;color:#9ca3af;">매물장(통화일) / 고객관리(신규등록·통화이력) 담당자별 집계 · 관리자 전용</span>
     <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="renderStats()">🔄 새로고침</button>
   </div>
   <div style="background:#fff;border:1px solid #dde1ec;border-radius:12px;overflow:auto;max-height:calc(100vh - 220px);padding:12px;">
@@ -952,7 +952,6 @@ const ACCOUNTS = {
   'ilim':     {pw:'ilim1234',  name:'강일임', manager:'강일임'},
   'jaemi':    {pw:'jaemi1234', name:'강재미', manager:'강재미'},
   'minhak':   {pw:'minhak1234',name:'김민학', manager:'김민학'},
-  'hyeseung': {pw:'hye1234',   name:'송혜승', manager:'송혜승'},
   'ssong85':  {pw:'ssong5678', name:'송예경', manager:'송예경'},
   'eunmi':    {pw:'eunmi8194', name:'김은미', manager:'김은미'},
   'admin':    {pw:'admin159357', name:'관리자', manager:'ALL'},
@@ -4364,9 +4363,8 @@ function _updateSubBar(tab) {
 }
 
 // ── 직원별 업무 통계 (관리자 전용) ──
-// 고객관리(DB: 신규등록+통화이력) + 매물장(MP1/MP2/MP3: 통화일) + 업무일지(JDB: 작성건)를
-// 담당자별로 집계. "상담추가"는 신규로 만들어진 항목(고객 신규등록, 업무일지 작성),
-// "전체"는 상담추가 + 통화이력/매물 업데이트까지 포함한 전체 활동 건수.
+// 담당자별로 "매물장"(MP1/MP2/MP3: 통화일 기준 활동) / "고객관리"(DB: 신규등록+통화이력)
+// 두 항목만 각각 집계.
 function _statsCollectByManager(){
   const today = new Date();
   today.setHours(0,0,0,0);
@@ -4391,8 +4389,8 @@ function _statsCollectByManager(){
 
   const result = {};
   managers.forEach(m => {
-    result[m] = { add:{}, total:{} };
-    periods.forEach(p => { result[m].add[p.key] = 0; result[m].total[p.key] = 0; });
+    result[m] = { maemul:{}, crm:{} };
+    periods.forEach(p => { result[m].maemul[p.key] = 0; result[m].crm[p.key] = 0; });
   });
 
   function inPeriod(dateStr, fromStr){
@@ -4400,36 +4398,28 @@ function _statsCollectByManager(){
     const d = String(dateStr).trim();
     return d >= fromStr && d <= todayStr;
   }
-  // 고객관리: 신규 등록(상담추가+전체) / 통화이력(전체만)
+
+  // 고객관리: 신규 등록 + 통화이력
   (window.DB||[]).forEach(r=>{
     const m = result[r.manager];
     if(!m) return;
     periods.forEach(p=>{
-      if(inPeriod(r.date, p.from)){ m.add[p.key]++; m.total[p.key]++; }
+      if(inPeriod(r.date, p.from)) m.crm[p.key]++;
     });
     (r.history||[]).forEach(h=>{
       periods.forEach(p=>{
-        if(inPeriod(h.d, p.from)) m.total[p.key]++;
+        if(inPeriod(h.d, p.from)) m.crm[p.key]++;
       });
     });
   });
 
-  // 업무일지: 작성 건수(상담추가+전체)
-  (window.JDB||[]).forEach(r=>{
-    const m = result[r.manager];
-    if(!m) return;
-    periods.forEach(p=>{
-      if(inPeriod(r.date, p.from)){ m.add[p.key]++; m.total[p.key]++; }
-    });
-  });
-
-  // 매물장(매매/광고기타/전월세): 통화일 기준 활동(전체만 — 등록일 필드가 없어 신규 여부 구분 불가)
+  // 매물장(매매/광고기타/전월세): 통화일 기준 활동
   [window.MP1||[], window.MP2||[], window.MP3||[]].forEach(arr=>{
     arr.forEach(r=>{
       const m = result[r.manager];
       if(!m) return;
       periods.forEach(p=>{
-        if(inPeriod(r.callDate, p.from)) m.total[p.key]++;
+        if(inPeriod(r.callDate, p.from)) m.maemul[p.key]++;
       });
     });
   });
@@ -4451,12 +4441,12 @@ function renderStats(){
     const r = result[m];
     html += `<tr style="background:${bg};">`;
     html += `<td rowspan="2" style="padding:8px;border:1px solid #e5e7eb;font-weight:700;vertical-align:middle;">${m}</td>`;
-    html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;color:#6b7280;">상담추가</td>`;
-    periods.forEach(p => html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;">${r.add[p.key]}</td>`);
+    html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;color:#6b7280;">매물장</td>`;
+    periods.forEach(p => html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;">${r.maemul[p.key]}</td>`);
     html += '</tr>';
     html += `<tr style="background:${bg};">`;
-    html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;color:#6b7280;">전체</td>`;
-    periods.forEach(p => html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;font-weight:700;">${r.total[p.key]}</td>`);
+    html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;color:#6b7280;">고객관리</td>`;
+    periods.forEach(p => html += `<td style="padding:6px 8px;border:1px solid #e5e7eb;font-weight:700;">${r.crm[p.key]}</td>`);
     html += '</tr>';
   });
   html += '</tbody></table>';
