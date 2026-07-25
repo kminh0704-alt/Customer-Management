@@ -4275,12 +4275,32 @@ function uploadAdvert(input) {
     const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:false});
     let parsed = [];
     if(aTab===0) {
+      // 기존(이전 업로드) 데이터와 동별로 비교하여 네이버 매물수 증감을 변동으로 계산하고,
+      // 변동이 있으면 변동일을 오늘 날짜로 자동 기록한다.
+      const oldMap = {};
+      MP6.forEach(r => { if(r.dong) oldMap[r.dong] = r; });
+      const _today = new Date();
+      const _pad = n => String(n).padStart(2,'0');
+      const todayStr = `${_today.getFullYear()}-${_pad(_today.getMonth()+1)}-${_pad(_today.getDate())}`;
+      const numOf = v => parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')) || 0;
+      const fmtDiff = n => n>0 ? `+${n}` : (n<0 ? String(n) : '');
       rows.slice(2).forEach(r => {
         if(!r[0]) return;
-        parsed.push({dong:escStr(r[0]),
-          mNav:escStr(r[1]),mOur:escStr(r[2]),mDiff:escStr(r[3]),
-          jNav:escStr(r[12]),jOur:escStr(r[13]),jDiff:escStr(r[14]),
-          wNav:escStr(r[23]),wOur:escStr(r[24]),wDiff:escStr(r[25])});
+        const dong = escStr(r[0]);
+        const mNav=escStr(r[1]), mOur=escStr(r[2]);
+        const jNav=escStr(r[12]), jOur=escStr(r[13]);
+        const wNav=escStr(r[23]), wOur=escStr(r[24]);
+        const old = oldMap[dong];
+        let mDiff='', jDiff='', wDiff='', changed=false;
+        if(old){
+          const dM = numOf(mNav)-numOf(old.mNav);
+          const dJ = numOf(jNav)-numOf(old.jNav);
+          const dW = numOf(wNav)-numOf(old.wNav);
+          mDiff=fmtDiff(dM); jDiff=fmtDiff(dJ); wDiff=fmtDiff(dW);
+          changed = (dM!==0 || dJ!==0 || dW!==0);
+        }
+        const changeDate = changed ? todayStr : (old ? (old.changeDate||'') : '');
+        parsed.push({dong, mNav, mOur, mDiff, jNav, jOur, jDiff, wNav, wOur, wDiff, changeDate});
       });
     } else if(aTab===3) {
       rows.slice(1).forEach(r => {
