@@ -4247,14 +4247,31 @@ function uploadReal(input) {
 }
 
 // ── 광고 업로드 ──
+// 시트 이름이 정확히 일치하지 않아도(공백/언더스코어 차이, 부분 포함 등) 찾아내기 위한 헬퍼
+function _findAdvertSheet(wb, hints){
+  for(const h of hints){ if(wb.Sheets[h]) return wb.Sheets[h]; }
+  const norm = s => String(s).replace(/[\s_]/g,'');
+  for(const name of wb.SheetNames){
+    if(hints.some(h => norm(h)===norm(name))) return wb.Sheets[name];
+  }
+  for(const name of wb.SheetNames){
+    if(hints.some(h => name.includes(h) || h.includes(name))) return wb.Sheets[name];
+  }
+  return null;
+}
+
 function uploadAdvert(input) {
   if(!input.files[0]) return;
   downloadFullBackup();
   readExcel(input.files[0], wb => {
-    const sheetNames = ['광고 변동 확인','이편한광고','써밋광고'];
-    const sname = sheetNames[aTab];
-    const ws = wb.Sheets[sname];
-    if(!ws) { alert(`"${sname}" 시트를 찾을 수 없습니다.`); return; }
+    const sheetHints = [
+      ['광고 변동 확인','광고변동확인'],
+      ['이편한광고'],
+      ['써밋광고'],
+      ['광고비교분석','광고비교_분석'],
+    ];
+    const ws = _findAdvertSheet(wb, sheetHints[aTab] || []);
+    if(!ws) { alert(`알맞은 시트를 찾을 수 없습니다. (엑셀 시트 목록: ${wb.SheetNames.join(', ')})`); return; }
     const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:false});
     let parsed = [];
     if(aTab===0) {
@@ -4264,6 +4281,21 @@ function uploadAdvert(input) {
           mNav:escStr(r[1]),mOur:escStr(r[2]),mDiff:escStr(r[3]),
           jNav:escStr(r[12]),jOur:escStr(r[13]),jDiff:escStr(r[14]),
           wNav:escStr(r[23]),wOur:escStr(r[24]),wDiff:escStr(r[25])});
+      });
+    } else if(aTab===3) {
+      rows.slice(1).forEach(r => {
+        if(!r[1] || !r[2]) return;
+        parsed.push({
+          date: fmtDate(r[0]),
+          dong: escStr(r[1]),
+          ho: escStr(r[2]),
+          gubun: escStr(r[4]),
+          eok: escStr(r[7]),
+          rent: escStr(r[6]),
+          agency: escStr(r[11]),
+          status: escStr(r[12]).replace(/^[✅❌]\s*/,'').trim(),
+          note: escStr(r[13]),
+        });
       });
     } else {
       rows.slice(1).forEach(r => {
@@ -4276,7 +4308,7 @@ function uploadAdvert(input) {
     }
     if(!parsed.length) { alert('데이터가 없습니다.'); return; }
     if(!confirm(`${parsed.length}건을 불러옵니다. 교체할까요?`)) return;
-    [MP6,MP7,MP8][aTab].splice(0,[MP6,MP7,MP8][aTab].length,...parsed);
+    [MP6,MP7,MP8,MP9][aTab].splice(0,[MP6,MP7,MP8,MP9][aTab].length,...parsed);
     renderAdvert();
     saveAdvertToFirebase();
     alert(`✅ ${parsed.length}건 반영 완료!`);
