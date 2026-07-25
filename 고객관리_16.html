@@ -4266,8 +4266,8 @@ function uploadAdvert(input) {
   readExcel(input.files[0], wb => {
     const sheetHints = [
       ['광고 변동 확인','광고변동확인'],
-      ['이편한광고'],
-      ['써밋광고'],
+      ['이편한광고','결과내역'],
+      ['써밋광고','결과내역'],
       ['광고비교분석','광고비교_분석'],
     ];
     const ws = _findAdvertSheet(wb, sheetHints[aTab] || []);
@@ -4298,12 +4298,27 @@ function uploadAdvert(input) {
         });
       });
     } else {
+      // 네이버부동산 "결과내역" 추출 형식: 매물번호,등록일자(YYYYMMDD),거래유형,매매가/보증금(만원단위 숫자),
+      // 물건유형,단지명,월세(만원단위 숫자),공급면적,전용면적,동,층정보,호실,방향,동일매물갯수,확인구분,부동산,...
       rows.slice(1).forEach(r => {
-        if(!r[0]) return;
-        parsed.push({date:fmtDate(r[0]),gubun:escStr(r[1]),
-          price:fmtMoney(r[2]),rent:escStr(r[3]),
-          dong:escStr(r[4]),level:escStr(r[5]),ho:escStr(r[6]),
-          adCnt:escStr(r[7]),owner:escStr(r[8]),agency:escStr(r[9])});
+        if(!r[0] || !r[9]) return;
+        const rawDate = String(r[1]||'').trim();
+        const dm = rawDate.match(/^(\d{4})(\d{2})(\d{2})$/);
+        const date = dm ? `${dm[1]}-${dm[2]}-${dm[3]}` : fmtDate(r[1]);
+        const rentVal = parseFloat(String(r[6]||'').replace(/[^0-9.]/g,'')) || 0;
+        const hoRaw = escStr(r[11]);
+        parsed.push({
+          date,
+          gubun: escStr(r[2]),
+          price: fmtMoneyMan(r[3]),
+          rent: rentVal>0 ? fmtMoneyMan(r[6]) : '',
+          dong: escStr(r[9]),
+          level: escStr(r[10]),
+          ho: hoRaw ? hoRaw+'호' : '',
+          adCnt: escStr(r[13]),
+          owner: escStr(r[14]),
+          agency: escStr(r[15]),
+        });
       });
     }
     if(!parsed.length) { alert('데이터가 없습니다.'); return; }
