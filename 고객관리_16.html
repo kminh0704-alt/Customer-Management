@@ -3623,11 +3623,11 @@ function getACols(){
     {key:'dong',label:'동',w:'62px'},
     {key:'ho',label:'호',w:'58px'},
     {key:'gubun',label:'구분',w:'45px'},
-    {key:'eok',label:'금액',w:'70px',align:'right'},
+    {key:'eok',label:'금액',w:'70px'},
     {key:'rent',label:'차임',w:'48px'},
-    {key:'agency',label:'등록부동산(타사)',w:'200px',align:'left'},
+    {key:'agency',label:'등록부동산(타사)',w:'200px'},
     {key:'status',label:'우리광고여부',w:'100px'},
-    {key:'note',label:'메모',w:'180px',align:'left'},
+    {key:'note',label:'메모',w:'180px'},
   ];
   return [ // 이편한광고, 써밋광고
     {key:'date',label:'날짜',w:'82px'},
@@ -3863,8 +3863,8 @@ function renderAdvert(){
       let style=TD(c.align||'center');
       let content=val;
       if(c.key==='gubun') content=`<span style="background:${val==='매매'?'#fef3c7':'#dbeafe'};padding:2px 5px;border-radius:4px;font-size:10px;font-weight:700">${val}</span>`;
-      else if(c.key==='price'||c.key==='eok') style=TD('right','font-weight:700;color:#ff6b2b;');
-      else if(c.key==='agency') style=TD('left','font-size:13px;color:#1a1d2e;');
+      else if(c.key==='price'||c.key==='eok') style=TD('center','font-weight:700;color:#ff6b2b;');
+      else if(c.key==='agency') style=TD('center','font-size:13px;color:#1a1d2e;');
       else if(['mDiff','jDiff','wDiff'].includes(c.key)){const n=parseInt(val);content=`<span style="color:${n>0?'#dc2626':n<0?'#16a34a':'#6b7280'};font-weight:${n!==0?700:400}">${val}</span>`;}
       else if(aTab===0 && c.key==='changeDate'){
         style=TD('center','padding:4px 6px;');
@@ -3879,7 +3879,7 @@ function renderAdvert(){
         const s=sMap[val]||{bg:'#f3f4f6',fg:'#6b7280',icon:''};
         content=`<span style="background:${s.bg};color:${s.fg};padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;">${s.icon} ${val}</span>`;
       }
-      else if(c.key==='note'&&aTab===3) style=TD('left','font-size:12px;color:#6b7280;');
+      else if(c.key==='note'&&aTab===3) style=TD('center','font-size:12px;color:#6b7280;');
       return `<td style="${style}">${content}</td>`;
     }).join('');
     return `<tr onmouseover="this.style.background='#fff8f5'" onmouseout="this.style.background=''">${cells}</tr>`;
