@@ -2623,7 +2623,7 @@ function buildMaemulForm(r){
     b+=inpF('pyung','평형',r.pyung)+inpF('type','타입',r.type);
     b+=inpF('dong','동',r.dong)+inpF('ho','호',r.ho)+inpF('total','총층',r.total);
     b+=inpF('adPrice','광고금액',r.adPrice)+inpF('price','매매가',r.price)+inpF('adj','조정가',r.adj)+inpF('sellPrice','매도가(자동계산)',calcSellPrice(r.price));
-    const mgrs=['강일임','강재미','김민학','송혜승','송예경','김은미'];
+    const mgrs=['강일임','강재미','김민학','송혜승','송예경','김은미','X'];
     b+=inpF('movein','입주가능',r.movein)+selF('manager','담당',r.manager,MGR_OPTIONS);
     b+=`<div class="fg"><label>최근통화</label><select id="mf_lastCall" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"><option value=""></option>${mgrs.map(m=>`<option ${m===(r.lastCall||'')?'selected':''}>${m}</option>`).join('')}</select></div>`;
     b+=`<div class="fg"><label>통화일</label><input type="date" id="mf_callDate" value="${r.callDate||''}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"></div>`;
@@ -2635,7 +2635,7 @@ function buildMaemulForm(r){
     b+=inpF('dong','동',r.dong)+inpF('ho','호',r.ho);
     b+=inpF('jeon','전세보증금',r.jeon)+inpF('deposit','보증금',r.deposit)+inpF('rent','차임',r.rent);
     b+=inpF('movein','입주가능',r.movein)+selF('manager','담당',r.manager,MGR_OPTIONS);
-    const mgrs2=['강일임','강재미','김민학','송혜승','송예경','김은미'];
+    const mgrs2=['강일임','강재미','김민학','송혜승','송예경','김은미','X'];
     b+=`<div class="fg"><label>최근통화</label><select id="mf_lastCall" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"><option value=""></option>${mgrs2.map(m=>`<option ${m===(r.lastCall||'')?'selected':''}>${m}</option>`).join('')}</select></div>`;
     b+=`<div class="fg"><label>통화일</label><input type="date" id="mf_callDate" value="${r.callDate||''}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"></div>`;
     b+=taF('option','추가옵션',r.option)+taF('note','특이사항',r.note)+inpF('tradeBiz','거래 부동산',r.tradeBiz||'');
