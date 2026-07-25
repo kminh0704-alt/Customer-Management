@@ -3632,7 +3632,7 @@ function getACols(){
   return [ // 이편한광고, 써밋광고
     {key:'date',label:'날짜',w:'82px'},
     {key:'gubun',label:'구분',w:'45px'},
-    {key:'price',label:'금액',w:'72px',align:'right'},
+    {key:'price',label:'금액',w:'72px'},
     {key:'rent',label:'차임',w:'48px'},
     {key:'dong',label:'동',w:'62px'},
     {key:'level',label:'고중저',w:'55px'},
@@ -3844,7 +3844,7 @@ function renderAdvert(){
     const fIcon=hasF?'🔽':'▼';
     const fColor=hasF?'#ffe066':'rgba(255,255,255,.7)';
     const w=savedAW[c.key]?savedAW[c.key]+'px':c.w;
-    return `<th id="ath_${c.key}" style="${thBase}text-align:center;position:relative;">
+    return `<th id="ath_${c.key}" style="${thBase}text-align:center;">
       <div style="display:flex;align-items:center;justify-content:center;gap:4px;overflow:hidden;">
         <span onclick="aSort('${c.key}')" style="cursor:pointer;flex:1;overflow:hidden;text-overflow:ellipsis;text-align:center;">${c.label}${arr}</span>
         <span class="a-filter-btn" onclick="event.stopPropagation();toggleAFilterDD('${c.key}',this)"
