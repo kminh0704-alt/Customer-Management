@@ -2598,6 +2598,11 @@ function openMaemulEdit(visIdx){
 
 function inpF(id,label,val,type){return `<div class="fg"><label>${label}</label><input type="${type||'text'}" id="mf_${id}" value="${(val||'').toString().replace(/"/g,'&quot;')}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;box-sizing:border-box;"></div>`;}
 function selF(id,label,val,opts){return `<div class="fg"><label>${label}</label><select id="mf_${id}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"><option value=""></option>${opts.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join('')}</select></div>`;}
+// selF와 달리 목록에 없는 값도 직접 입력할 수 있는 콤보박스 (datalist 기반)
+function selEditF(id,label,val,opts){
+  const dlId = 'dl_'+id;
+  return `<div class="fg"><label>${label}</label><input list="${dlId}" id="mf_${id}" value="${(val||'').toString().replace(/"/g,'&quot;')}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;box-sizing:border-box;"><datalist id="${dlId}">${opts.map(o=>`<option value="${o}">`).join('')}</datalist></div>`;
+}
 function taF(id,label,val){return `<div class="fg full"><label>${label}</label><textarea id="mf_${id}" rows="3" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;resize:vertical;">${val||''}</textarea></div>`;}
 
 // ── 매도가격 자동계산 (매매가 - 5천만원(0.5억)) ──
@@ -2619,7 +2624,7 @@ function buildMaemulForm(r){
   const DANJI=['이편한','써밋','래미안','오드카운티','자연앤자이3','힐스테이트','중흥S클래스','기타'];
   let b='<div class="form-grid">';
   if(mTab<=1){
-    b+=selF('danji','단지',r.danji,DANJI)+selF('priority','우선순위',r.priority,PRIORITY_OPTIONS);
+    b+=selEditF('danji','단지',r.danji,DANJI)+selF('priority','우선순위',r.priority,PRIORITY_OPTIONS);
     b+=inpF('pyung','평형',r.pyung)+inpF('type','타입',r.type);
     b+=inpF('dong','동',r.dong)+inpF('ho','호',r.ho)+inpF('total','총층',r.total);
     b+=inpF('adPrice','광고금액',r.adPrice)+inpF('price','매매가',r.price)+inpF('adj','조정가',r.adj)+inpF('sellPrice','매도가(자동계산)',calcSellPrice(r.price));
@@ -2629,7 +2634,7 @@ function buildMaemulForm(r){
     b+=`<div class="fg"><label>통화일</label><input type="date" id="mf_callDate" value="${r.callDate||''}" style="background:#f9fafb;border:1.5px solid #dde1ec;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;width:100%;"></div>`;
     b+=taF('option','추가옵션',r.option)+taF('note','특이사항',r.note)+inpF('tradeBiz','거래 부동산',r.tradeBiz||'');
   } else if(mTab===2){
-    b+=selF('danji','단지',r.danji,DANJI)+selF('gubun','구분',r.gubun,['전세','월세']);
+    b+=selEditF('danji','단지',r.danji,DANJI)+selF('gubun','구분',r.gubun,['전세','월세']);
     b+=selF('priority','우선순위',r.priority,PRIORITY_OPTIONS);
     b+=inpF('pyung','평형',r.pyung)+inpF('type','타입',r.type);
     b+=inpF('dong','동',r.dong)+inpF('ho','호',r.ho);
