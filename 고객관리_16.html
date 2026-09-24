@@ -2391,47 +2391,23 @@ function renderMaemul(resetPage){
     }
     mFBar.style.display = 'block';
 
-    // 필터 옵션 수집
-    const allRows = getMData();
-    const getOpts = (key) => [...new Set(allRows.map(r=>r[key]||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'));
-    const danjiOpts = getOpts('danji');
-    const priorOpts = [...new Set(allRows.map(r=>r.priority||'').filter(Boolean))].sort();
-    const pyungOpts = [...new Set(allRows.map(r=>r.pyung||'').filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
-    const typeOpts = getOpts('type');
-    const dongOpts = getOpts('dong');
-
-    // 현재 필터 상태
-    const mf = window._mobileFilter = window._mobileFilter || {};
-
-    const selStyle = 'padding:5px 8px;border:1px solid #dde1ec;border-radius:7px;font-size:11px;font-family:inherit;background:#fff;color:#1a1d2e;flex:1;min-width:0;';
-    const activeStyle = 'padding:5px 8px;border:1px solid #ff6b2b;border-radius:7px;font-size:11px;font-family:inherit;background:#fff3ee;color:#ff6b2b;flex:1;min-width:0;';
+    // 필터 버튼 — 탭하면 PC와 동일한 다중선택+정렬 드롭다운(toggleFilterDD)이 뜬다.
+    // mColFilters는 PC/모바일 공용이며, 실제 필터 적용은 이 함수 상단에서 이미 처리됨.
+    const mBtnStyle = (key) => (mColFilters[key] && mColFilters[key].size>0)
+      ? 'padding:6px 9px;border:1.5px solid #ff6b2b;border-radius:7px;font-size:11px;font-family:inherit;background:#fff3ee;color:#c94f18;font-weight:600;flex:1;min-width:0;white-space:nowrap;'
+      : 'padding:6px 9px;border:1px solid #dde1ec;border-radius:7px;font-size:11px;font-family:inherit;background:#fff;color:#1a1d2e;flex:1;min-width:0;white-space:nowrap;';
+    const mBtnLabel = (key,label) => {
+      const n = mColFilters[key] ? mColFilters[key].size : 0;
+      return n>0 ? `${label} · ${n}` : label;
+    };
 
     mFBar.innerHTML = `<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
-      <select style="${mf.danji?activeStyle:selStyle}" onchange="window._mobileFilter.danji=this.value||'';renderMaemul()">
-        <option value="">단지</option>${danjiOpts.map(v=>`<option value="${v}" ${mf.danji===v?'selected':''}>${v}</option>`).join('')}
-      </select>
-      <select style="${mf.priority?activeStyle:selStyle}" onchange="window._mobileFilter.priority=this.value||'';renderMaemul()">
-        <option value="">우선순위</option>${priorOpts.map(v=>`<option value="${v}" ${mf.priority===v?'selected':''}>${v}</option>`).join('')}
-      </select>
-      <select style="${mf.pyung?activeStyle:selStyle}" onchange="window._mobileFilter.pyung=this.value||'';renderMaemul()">
-        <option value="">평형</option>${pyungOpts.map(v=>`<option value="${v}" ${mf.pyung===v?'selected':''}>${v}평</option>`).join('')}
-      </select>
-      <select style="${mf.type?activeStyle:selStyle}" onchange="window._mobileFilter.type=this.value||'';renderMaemul()">
-        <option value="">타입</option>${typeOpts.map(v=>`<option value="${v}" ${mf.type===v?'selected':''}>${v}</option>`).join('')}
-      </select>
-      <select style="${mf.dong?activeStyle:selStyle}" onchange="window._mobileFilter.dong=this.value||'';renderMaemul()">
-        <option value="">동</option>${dongOpts.map(v=>`<option value="${v}" ${mf.dong===v?'selected':''}>${v}동</option>`).join('')}
-      </select>
-      ${Object.values(mf).some(v=>v) ? `<button onclick="window._mobileFilter={};renderMaemul()" style="padding:5px 8px;border:1px solid #fca5a5;border-radius:7px;font-size:11px;background:#fff0f0;color:#dc2626;cursor:pointer;font-family:inherit;white-space:nowrap;">✕ 초기화</button>` : ''}
+      <button type="button" class="m-filter-btn" style="${mBtnStyle('danji')}" onclick="toggleFilterDD('danji',this)">${mBtnLabel('danji','단지')} ▾</button>
+      <button type="button" class="m-filter-btn" style="${mBtnStyle('priority')}" onclick="toggleFilterDD('priority',this)">${mBtnLabel('priority','우선순위')} ▾</button>
+      <button type="button" class="m-filter-btn" style="${mBtnStyle('pyung')}" onclick="toggleFilterDD('pyung',this)">${mBtnLabel('pyung','평형')} ▾</button>
+      <button type="button" class="m-filter-btn" style="${mBtnStyle('type')}" onclick="toggleFilterDD('type',this)">${mBtnLabel('type','타입')} ▾</button>
+      <button type="button" class="m-filter-btn" style="${mBtnStyle('dong')}" onclick="toggleFilterDD('dong',this)">${mBtnLabel('dong','동')} ▾</button>
     </div>`;
-
-    // 모바일 필터 적용
-    const mf2 = window._mobileFilter || {};
-    if(mf2.danji) rows = rows.filter(r=>r.danji===mf2.danji);
-    if(mf2.priority) rows = rows.filter(r=>r.priority===mf2.priority);
-    if(mf2.pyung) rows = rows.filter(r=>r.pyung===mf2.pyung);
-    if(mf2.type) rows = rows.filter(r=>r.type===mf2.type);
-    if(mf2.dong) rows = rows.filter(r=>r.dong===mf2.dong);
 
     let mCW = document.getElementById('maemulCardWrap');
     if (!mCW) {
@@ -4489,7 +4465,14 @@ async function saveJournal_db(changedIds) {
   await saveAllJDB();
 }
 
-let currentTab = 'crm';
+// 새로고침해도 마지막에 있던 메인 탭을 유지하기 위해 localStorage에서 복원
+let currentTab = (function(){
+  const valid = ['crm','journal','maemul','advert','real','elevation','stats'];
+  try {
+    const t = localStorage.getItem('lastMainTab');
+    return valid.includes(t) ? t : 'crm';
+  } catch(e) { return 'crm'; }
+})();
 
 // 탭 버튼 style 상수
 const _TAB_ON  = 'padding:5px 13px;font-size:12px;font-weight:700;border-radius:7px;border:none;background:#ff6b2b;color:#fff;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;';
@@ -4634,6 +4617,7 @@ function renderStats(){
 function switchTab(tab) {
   setTimeout(()=>updateUndoBtn(tab), 100);
   currentTab = tab;
+  try { localStorage.setItem('lastMainTab', tab); } catch(e) {}
   if(typeof updateMobileNav==='function') updateMobileNav(tab);
 
   // 화면 전환
@@ -5001,7 +4985,8 @@ function showApp() {
   const _statsTabBtn = document.getElementById('tabStats');
   if(_statsTabBtn) _statsTabBtn.style.display = (currentUser.manager === 'ALL') ? '' : 'none';
   // 서브바 버튼은 switchTab/_updateSubBar에서 관리
-  _updateSubBar(currentTab);
+  if (currentTab === 'stats' && currentUser.manager !== 'ALL') currentTab = 'crm';
+  switchTab(currentTab);
   // 담당자이면 신규 등록 폼에서 본인 담당 자동 설정
   if (currentUser.manager !== 'ALL') {
     const sel = document.getElementById('f_manager');
