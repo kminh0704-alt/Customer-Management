@@ -1963,7 +1963,7 @@ let mColFilters = {}; // {colKey: Set(선택값들)}
 let mOpenFilter = null; // 현재 열린 필터 컬럼키
 
 const MGR_OPTIONS = ['강일임','강재미','김민학','송혜승','송예경','김은미'];
-const PRIORITY_OPTIONS = ['추천','1','2','3','매예','우리 계약','완료','보류'];
+const PRIORITY_OPTIONS = ['급매','추천','1','2','3','매예','우리 계약','완료','보류'];
 
 function normManager(v){
   if(!v) return v;
@@ -2021,14 +2021,24 @@ function resetMaemulFilters() {
   renderMaemul();
 }
 
-function mSort(key){
-  if(mSortKey===key) mSortDir*=-1; else{mSortKey=key;mSortDir=1;}
+function _mSaveTabState(){
   try {
     const f={};
     for(const [k,v] of Object.entries(mColFilters)) { f[k]=[...v]; }
-    const _sk1='mTabState_'+(currentUser?currentUser.manager:'ALL')+'_'+mTab;
-    localStorage.setItem(_sk1, JSON.stringify({sortKey:mSortKey,sortDir:mSortDir,filters:f}));
+    const _sk='mTabState_'+(currentUser?currentUser.manager:'ALL')+'_'+mTab;
+    localStorage.setItem(_sk, JSON.stringify({sortKey:mSortKey,sortDir:mSortDir,filters:f}));
   } catch(e) {}
+}
+function mSort(key){
+  if(mSortKey===key) mSortDir*=-1; else{mSortKey=key;mSortDir=1;}
+  _mSaveTabState();
+  closeFilterDD();
+  renderMaemul();
+}
+// 필터 드롭다운의 오름차순/내림차순 버튼: 방향을 명시적으로 고정하고 현재 탭에 저장
+function mSortSet(key, dir){
+  mSortKey=key; mSortDir=dir;
+  _mSaveTabState();
   closeFilterDD();
   renderMaemul();
 }
@@ -2221,8 +2231,8 @@ function toggleFilterDD(key, btnEl){
   // 정렬 버튼
   dd.innerHTML=`
     <div style="padding:4px 14px;display:flex;gap:6px;border-bottom:1px solid #f0f2f7;margin-bottom:6px;padding-bottom:8px;">
-      <button onclick="mSort('${key}');closeFilterDD();" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↑ 오름차순</button>
-      <button onclick="mSortKey='${key}';mSortDir=-1;renderMaemul();closeFilterDD();" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↓ 내림차순</button>
+      <button onclick="mSortSet('${key}',1);" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↑ 오름차순</button>
+      <button onclick="mSortSet('${key}',-1);" style="flex:1;padding:5px;border:1px solid #dde1ec;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit;">↓ 내림차순</button>
     </div>
     <div style="padding:4px 14px 6px;border-bottom:1px solid #f0f2f7;">
       <input id="mFSearchInput" type="text" placeholder="🔍 검색..." oninput="filterDDSearch('${key}')"
@@ -2307,12 +2317,7 @@ function applyFilterDD(key){
   if(sel.size===0||sel.size===allVals.size) delete mColFilters[key];
   else mColFilters[key]=sel;
   // 필터/정렬 상태 저장
-  try {
-    const f={};
-    for(const [k,v] of Object.entries(mColFilters)) { f[k]=[...v]; }
-    const _sk2='mTabState_'+(currentUser?currentUser.manager:'ALL')+'_'+mTab;
-    localStorage.setItem(_sk2, JSON.stringify({sortKey:mSortKey,sortDir:mSortDir,filters:f}));
-  } catch(e) {}
+  _mSaveTabState();
   closeFilterDD();
   renderMaemul();
 }
