@@ -433,6 +433,8 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
   <!-- 오른쪽 끝 -->
   <div style="margin-left:auto;display:flex;gap:3px;flex-shrink:0;">
     <button id="btnFullBackup" class="btn btn-ghost" onclick="downloadFullBackup()" style="font-size:11px;padding:5px 11px;background:#e0f2fe;color:#0369a1;border-color:#7dd3fc;display:none;" title="전체 데이터 백업">💾 전체백업</button>
+    <input type="file" id="restoreBackupInput" accept="application/json,.json" style="display:none;" onchange="restoreFullBackup(this)">
+    <button id="btnFullRestore" class="btn btn-ghost" onclick="document.getElementById('restoreBackupInput').click()" style="font-size:11px;padding:5px 11px;background:#fef3c7;color:#b45309;border-color:#fcd34d;display:none;" title="백업 파일로 전체 데이터 복원">📤 전체복원</button>
     <button class="btn btn-ghost" onclick="toggleBlind(1)" style="font-size:11px;padding:5px 11px;" id="blindBtn1" title="매수 상담용 (조정가까지만 숨김)">👁 매수 상담</button>
     <button class="btn btn-ghost" onclick="toggleBlind(2)" style="font-size:11px;padding:5px 11px;" id="blindBtn2" title="매도 상담용 (매매가까지 숨김)">👁 매도 상담</button>
     <button class="btn btn-ghost" onclick="doLogout()" style="font-size:11px;padding:5px 11px;">로그아웃</button>
@@ -4996,6 +4998,9 @@ function showApp() {
   document.getElementById('userBadge').textContent = currentUser.name + ' 님';
   // 전체백업 버튼 — 관리자만 표시
   document.getElementById('btnFullBackup').style.display = (currentUser.manager === 'ALL') ? '' : 'none';
+  // 전체복원 버튼 — 관리자만 표시
+  const _btnRestore = document.getElementById('btnFullRestore');
+  if(_btnRestore) _btnRestore.style.display = (currentUser.manager === 'ALL') ? '' : 'none';
   // 업무통계 탭 — 관리자만 표시
   const _statsTabBtn = document.getElementById('tabStats');
   if(_statsTabBtn) _statsTabBtn.style.display = (currentUser.manager === 'ALL') ? '' : 'none';
@@ -5092,6 +5097,93 @@ async function downloadFullBackup() {
     showToast('✅ 전체 백업 다운로드 완료!');
   } catch(e) {
     alert('백업 오류: ' + e.message);
+  }
+}
+
+// ── 전체 데이터 복원 (전체백업으로 받은 json 파일을 다시 업로드) ──
+async function restoreFullBackup(input) {
+  if (!currentUser || currentUser.manager !== 'ALL') {
+    alert('관리자만 전체 복원을 할 수 있습니다.');
+    input.value = '';
+    return;
+  }
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  try {
+    const text = await file.text();
+    let backup;
+    try { backup = JSON.parse(text); }
+    catch(e) { alert('❌ 올바른 백업 파일(json)이 아닙니다.'); input.value=''; return; }
+
+    if (!backup || typeof backup !== 'object' || !('customers' in backup || 'maemul_mp1' in backup)) {
+      alert('❌ 전체백업 파일 형식이 아닌 것 같습니다. "전체백업" 버튼으로 받은 파일을 선택해주세요.');
+      input.value = '';
+      return;
+    }
+
+    const counts = [
+      ['매물(매매1)', (backup.maemul_mp1||[]).length],
+      ['매물(매매2)', (backup.maemul_mp2||[]).length],
+      ['매물(전월세)', (backup.maemul_mp3||[]).length],
+      ['고객관리', (backup.customers||[]).length],
+      ['업무일지', (backup.journal||[]).length],
+      ['실거래(매매)', (backup.real_maemae||[]).length],
+      ['실거래(전월세)', (backup.real_jeonwolse||[]).length],
+      ['광고변동확인', (backup.advert1||[]).length],
+      ['이편한광고', (backup.advert2||[]).length],
+      ['써밋광고', (backup.advert3||[]).length],
+    ].map(([k,v]) => `· ${k}: ${v}건`).join('\n');
+
+    const ok = await _advertConfirmModal(
+      `⚠️ 백업 시점: ${backup.date || '날짜 미상'}\n\n이 파일 내용으로 현재 모든 데이터를 덮어씁니다.\n(지금 화면에 있는 데이터는 사라지고 백업 시점 데이터로 돌아갑니다)\n\n${counts}\n\n정말 복원하시겠습니까?`
+    );
+    if (!ok) { input.value = ''; return; }
+
+    // 복원 전 현재 상태를 안전하게 한 번 더 백업 다운로드
+    try { await downloadFullBackup(); } catch(e) {}
+
+    MP1 = backup.maemul_mp1 || []; window.MP1 = MP1;
+    MP2 = backup.maemul_mp2 || []; window.MP2 = MP2;
+    MP3 = backup.maemul_mp3 || []; window.MP3 = MP3;
+    DB = backup.customers || []; window.DB = DB;
+    JDB = backup.journal || []; window.JDB = JDB;
+    window.MP4 = backup.real_maemae || [];
+    window.MP5 = backup.real_jeonwolse || [];
+    MP6 = backup.advert1 || []; window.MP6 = MP6;
+    MP7 = backup.advert2 || []; window.MP7 = MP7;
+    MP8 = backup.advert3 || []; window.MP8 = MP8;
+
+    if (typeof ensureMaemulNo === 'function') ensureMaemulNo();
+
+    // Firebase에 각 데이터를 해당 컬렉션/문서에 직접 저장 (현재 열려있는 탭과 무관하게 전체 저장)
+    await Promise.all([
+      _FB.set('maemul_mp1', 'all', {json: JSON.stringify(MP1)}),
+      _FB.set('maemul_mp2', 'all', {json: JSON.stringify(MP2)}),
+      _FB.set('maemul_mp3', 'all', {json: JSON.stringify(MP3)}),
+      _FB.set('crm_data', 'customers', {json: JSON.stringify(DB)}),
+      _FB.set('crm_data', 'journal', {json: JSON.stringify(JDB)}),
+      db.collection('realData').doc('realMaemae').set({data: JSON.stringify(window.MP4)}),
+      db.collection('realData').doc('realJeonwolse').set({data: JSON.stringify(window.MP5)}),
+      db.collection('advertData').doc('mp6').set({json: JSON.stringify(MP6)}),
+      db.collection('advertData').doc('mp7').set({json: JSON.stringify(MP7)}),
+      db.collection('advertData').doc('mp8').set({json: JSON.stringify(MP8)}),
+    ]);
+
+    // 화면 갱신
+    if (typeof buildHeader === 'function') buildHeader();
+    if (typeof render === 'function') render();
+    if (typeof renderJournal === 'function') renderJournal();
+    if (typeof renderMaemul === 'function') renderMaemul();
+    if (typeof buildRColFilters === 'function') buildRColFilters();
+    if (typeof renderReal === 'function') renderReal();
+    if (typeof renderAdvert === 'function') renderAdvert();
+
+    alert('✅ 전체 데이터 복원이 완료되었습니다!');
+  } catch(e) {
+    console.error('복원 오류:', e);
+    alert('❌ 복원 중 오류가 발생했습니다: ' + e.message);
+  } finally {
+    input.value = '';
   }
 }
 
