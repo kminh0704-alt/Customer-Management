@@ -389,6 +389,18 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
 </head>
 <body>
 
+<!-- ── 접속 승인 대기 화면 ── -->
+<div id="accessPendingScreen" style="display:none;position:fixed;inset:0;background:rgba(255,245,240,.98);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(255,107,43,.12);padding:40px 36px 32px;width:340px;max-width:92vw;text-align:center;">
+    <div style="font-size:30px;margin-bottom:8px;">🔒</div>
+    <div style="font-size:17px;font-weight:800;color:#1a1d2e;margin-bottom:6px;">사무실 외부 접속</div>
+    <div style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:16px;">관리자 승인 후 사용할 수 있습니다.<br>승인되면 자동으로 열립니다.</div>
+    <div id="accessPendingMsg" style="background:#fef3c7;color:#b45309;border-radius:10px;padding:11px;font-size:13px;margin-bottom:12px;">⏳ 승인 대기 중…</div>
+    <div id="accessPendingIp" style="font-size:12px;color:#9ca3af;margin-bottom:14px;"></div>
+    <button onclick="cancelAccessRequest()" style="width:100%;padding:11px;background:#f3f4f6;color:#374151;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">요청 취소</button>
+  </div>
+</div>
+
 <!-- ── LOGIN SCREEN ── -->
 <div id="loginScreen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#fff5f0 0%,#fff 60%,#fff8f4 100%);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
   <div style="background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(255,107,43,.12);padding:44px 40px 36px;width:340px;max-width:92vw;">
@@ -432,6 +444,7 @@ window.MP5=[{apt:'광교센트럴뷰',date:'2024-01-04',deposit:'5000만',rent:'
   <button id="tabStats" onclick="switchTab('stats')" style="display:none;padding:5px 13px;font-size:12px;font-weight:600;border-radius:7px;border:1px solid #e8e8e8;background:#f5f5f5;color:#9ca3af;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;">📊 업무통계</button>
   <!-- 오른쪽 끝 -->
   <div style="margin-left:auto;display:flex;gap:3px;flex-shrink:0;">
+    <button id="btnAccessAdmin" class="btn btn-ghost" onclick="openAccessAdmin()" style="font-size:11px;padding:5px 11px;display:none;" title="사무실 외부 접속 승인">🔔 접속승인 <span id="accessBadge">0</span></button>
     <button id="btnFullBackup" class="btn btn-ghost" onclick="downloadFullBackup()" style="font-size:11px;padding:5px 11px;background:#e0f2fe;color:#0369a1;border-color:#7dd3fc;display:none;" title="전체 데이터 백업">💾 전체백업</button>
     <input type="file" id="restoreBackupInput" accept="application/json,.json" style="display:none;" onchange="restoreFullBackup(this)">
     <button id="btnFullRestore" class="btn btn-ghost" onclick="document.getElementById('restoreBackupInput').click()" style="font-size:11px;padding:5px 11px;background:#fef3c7;color:#b45309;border-color:#fcd34d;display:none;" title="백업 파일로 전체 데이터 복원">📤 전체복원</button>
@@ -952,7 +965,7 @@ function updateMobileNav(tab) {
 // ── ACCOUNTS ──
 const ACCOUNTS = {
   'ilim':     {pw:'ilim1234',  name:'강일임', manager:'강일임'},
-  'jaemi':    {pw:'jaemi1234', name:'강재미', manager:'강재미'},
+  'jaemi':    {pw:'jaemi1234777', name:'강재미', manager:'강재미'},
   'minhak':   {pw:'minhak1234',name:'김민학', manager:'김민학'},
   'ssong85':  {pw:'ssong5678', name:'송예경', manager:'송예경'},
   'eunmi':    {pw:'eunmi8194', name:'김은미', manager:'김은미'},
@@ -4976,11 +4989,7 @@ function init() {
   if (saved) {
     const key = saved;
     if (ACCOUNTS[key]) {
-      currentUser = ACCOUNTS[key];
-      currentUserId = key;
-      mySessionToken = sessionStorage.getItem('crmToken');
-      showApp();
-      startSessionCheck();
+      _gateAndEnter(key, ACCOUNTS[key], true);
       return;
     }
   }
@@ -5004,6 +5013,8 @@ function showApp() {
   // 업무통계 탭 — 관리자만 표시
   const _statsTabBtn = document.getElementById('tabStats');
   if(_statsTabBtn) _statsTabBtn.style.display = (currentUser.manager === 'ALL') ? '' : 'none';
+  // 접속승인 버튼 — 관리자만 표시
+  _startAdminAccessPoll();
   // 서브바 버튼은 switchTab/_updateSubBar에서 관리
   if (currentTab === 'stats' && currentUser.manager !== 'ALL') currentTab = 'crm';
   switchTab(currentTab);
@@ -5023,7 +5034,180 @@ function showApp() {
   }
 }
 
+// ── 접속 제한(사무실 IP) + 관리자 승인 ──
+// 직원 계정: 사무실 IP 이거나 휴대폰이면 바로 접속, 그 외 PC는 관리자 승인 필요
+const OFFICE_IPS = ['218.155.203.39'];
+const ACCESS_TTL_MS = 24 * 60 * 60 * 1000;
+const NTFY_TOPIC = 'gwanggyo-crm-I9cOz4Ts5EEejqKOOnv6lCp7';
+const SITE_URL = 'https://starlit-empanada-5ee0a9.netlify.app';
+let _accessPollTimer = null, _accessWatchTimer = null, _adminAccessTimer = null;
+let _accessDocId = null, _loginBusy = false, _adminPendingCount = -1;
+
+function _isMobileDevice() {
+  const ua = navigator.userAgent || '';
+  if (/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua)) return true;
+  if (navigator.userAgentData && navigator.userAgentData.mobile) return true;
+  if (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) return true;
+  return false;
+}
+function _getDeviceId() {
+  try {
+    let d = localStorage.getItem('crmDeviceId');
+    if (!d) { d = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); localStorage.setItem('crmDeviceId', d); }
+    return d;
+  } catch(e) { return 'nodev'; }
+}
+function _getPublicIp() {
+  const withTimeout = (url, parse) => new Promise((resolve, reject) => {
+    const ctl = new AbortController();
+    const t = setTimeout(() => { ctl.abort(); reject(new Error('timeout')); }, 4000);
+    fetch(url, {signal: ctl.signal, cache: 'no-store'}).then(r => r.text()).then(txt => {
+      clearTimeout(t);
+      const ip = parse(txt);
+      if (ip) resolve(ip); else reject(new Error('parse'));
+    }).catch(e => { clearTimeout(t); reject(e); });
+  });
+  const jsonIp = txt => { try { return (JSON.parse(txt).ip || '').trim(); } catch(e) { return ''; } };
+  const traceIp = txt => { const m = /^ip=(.+)$/m.exec(txt); return m ? m[1].trim() : ''; };
+  const tasks = [
+    withTimeout('https://api.ipify.org?format=json', jsonIp),
+    withTimeout('https://api64.ipify.org?format=json', jsonIp),
+    withTimeout('https://www.cloudflare.com/cdn-cgi/trace', traceIp)
+  ];
+  return new Promise(resolve => {
+    let left = tasks.length;
+    tasks.forEach(p => p.then(ip => resolve(ip), () => { if (--left === 0) resolve(''); }));
+  });
+}
+function _showAccessPending(msg, ip, isError) {
+  const scr = document.getElementById('accessPendingScreen');
+  scr.style.display = 'flex';
+  const m = document.getElementById('accessPendingMsg');
+  m.textContent = msg;
+  m.style.background = isError ? '#fee2e2' : '#fef3c7';
+  m.style.color = isError ? '#b91c1c' : '#b45309';
+  document.getElementById('accessPendingIp').textContent = ip ? ('접속 IP ' + ip) : '';
+}
+function _hideAccessPending() {
+  if (_accessPollTimer) { clearInterval(_accessPollTimer); _accessPollTimer = null; }
+  document.getElementById('accessPendingScreen').style.display = 'none';
+}
+function cancelAccessRequest() {
+  _hideAccessPending();
+  if (_accessDocId) {
+    try { db.collection('accessApprovals').doc(_accessDocId).set({status: 'cancelled'}, {merge: true}); } catch(e) {}
+  }
+  _accessDocId = null;
+  sessionStorage.removeItem('crmUser');
+  sessionStorage.removeItem('crmToken');
+  showLogin();
+}
+function _sendApprovalPush(name) {
+  try {
+    const t = new Date();
+    const hm = t.getHours() + ':' + String(t.getMinutes()).padStart(2, '0');
+    fetch('https://ntfy.sh/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({topic: NTFY_TOPIC, title: '접속 승인 요청', message: name + ' · ' + hm + ' · 사무실 외부 PC', click: SITE_URL, priority: 4, tags: ['lock']})
+    }).catch(() => {});
+  } catch(e) {}
+}
+
+// 로그인 후 접속 가능 여부 판단 → 가능하면 입장, 아니면 승인 대기
+async function _gateAndEnter(id, acc, isRestore) {
+  try {
+    if (acc.manager === 'ALL' || id === 'admin' || _isMobileDevice()) { _finishLogin(id, acc, isRestore, 0); return; }
+    const ip = await _getPublicIp();
+    if (ip && OFFICE_IPS.indexOf(ip) >= 0) { _finishLogin(id, acc, isRestore, 0); return; }
+    // 사무실 외부 PC → 관리자 승인 필요
+    const docId = id + '_' + _getDeviceId();
+    _accessDocId = docId;
+    const ref = db.collection('accessApprovals').doc(docId);
+    let snap;
+    try { snap = await ref.get(); }
+    catch(e) {
+      showLogin();
+      _showAccessPending('승인 서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.', ip, true);
+      return;
+    }
+    const cur = snap.exists ? snap.data() : null;
+    if (cur && cur.status === 'approved' && cur.approvedUntil > Date.now()) { _finishLogin(id, acc, isRestore, cur.approvedUntil); return; }
+    const recentPending = cur && cur.status === 'pending' && (Date.now() - (cur.requestedAt || 0) < 120000);
+    try {
+      await ref.set({userId: id, name: acc.name, ip: ip || '확인불가', deviceId: _getDeviceId(), ua: (navigator.userAgent || '').slice(0, 120), status: 'pending', requestedAt: Date.now(), approvedUntil: 0});
+    } catch(e) {
+      showLogin();
+      _showAccessPending('승인 요청을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.', ip, true);
+      return;
+    }
+    if (!recentPending) _sendApprovalPush(acc.name);
+    showLogin();
+    _showAccessPending('⏳ 승인 대기 중… (' + acc.name + ')', ip, false);
+    if (_accessPollTimer) clearInterval(_accessPollTimer);
+    _accessPollTimer = setInterval(async () => {
+      try {
+        const s = await ref.get();
+        const d = s.exists ? s.data() : null;
+        if (!d) return;
+        if (d.status === 'approved' && d.approvedUntil > Date.now()) {
+          _hideAccessPending();
+          _finishLogin(id, acc, isRestore, d.approvedUntil);
+        } else if (d.status === 'denied') {
+          clearInterval(_accessPollTimer); _accessPollTimer = null;
+          _showAccessPending('관리자가 접속을 거절했습니다.', ip, true);
+        }
+      } catch(e) {}
+    }, 3000);
+  } finally { _loginBusy = false; }
+}
+
+function _finishLogin(id, acc, isRestore, approvedUntil) {
+  _hideAccessPending();
+  currentUser = acc;
+  currentUserId = id;
+  sessionStorage.setItem('crmUser', id);
+  if (isRestore) {
+    mySessionToken = sessionStorage.getItem('crmToken');
+  } else {
+    // 이 브라우저만의 세션 토큰 발급 → Firebase에 기록 (중복 로그인 감지용)
+    mySessionToken = Date.now() + '_' + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('crmToken', mySessionToken);
+    const writeSession = () => {
+      _FB.set('sessions', id, {token: mySessionToken, name: acc.name, ts: Date.now()});
+    };
+    if (window._fbReady) writeSession();
+    else document.addEventListener('fbReady', writeSession, {once:true});
+  }
+  showApp();
+  startSessionCheck();
+  if (approvedUntil) _startAccessWatch(approvedUntil);
+}
+
+// 승인 만료/해제 감시 (사무실 외부 PC)
+function _startAccessWatch(approvedUntil) {
+  if (_accessWatchTimer) clearInterval(_accessWatchTimer);
+  let until = approvedUntil;
+  _accessWatchTimer = setInterval(async () => {
+    if (!currentUserId) return;
+    if (Date.now() > until) {
+      alert('접속 승인 시간이 만료되어 로그아웃되었습니다.');
+      doLogout();
+      return;
+    }
+    try {
+      const s = await db.collection('accessApprovals').doc(_accessDocId).get();
+      const d = s.exists ? s.data() : null;
+      if (!d || d.status !== 'approved') {
+        alert('관리자가 접속을 해제하여 로그아웃되었습니다.');
+        doLogout();
+      } else if (d.approvedUntil) { until = d.approvedUntil; }
+    } catch(e) {}
+  }, 20000);
+}
+
 function doLogin() {
+  if (_loginBusy) return;
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPw').value;
   const acc = ACCOUNTS[id];
@@ -5031,21 +5215,101 @@ function doLogin() {
     document.getElementById('loginErr').textContent = '아이디 또는 비밀번호가 올바르지 않습니다.';
     return;
   }
-  currentUser = acc;
-  currentUserId = id;
-  sessionStorage.setItem('crmUser', id);
+  document.getElementById('loginErr').textContent = '';
+  _loginBusy = true;
+  _gateAndEnter(id, acc, false);
+}
 
-  // 이 브라우저만의 세션 토큰 발급 → Firebase에 기록 (중복 로그인 감지용)
-  mySessionToken = Date.now() + '_' + Math.random().toString(36).slice(2);
-  sessionStorage.setItem('crmToken', mySessionToken);
-  const writeSession = () => {
-    _FB.set('sessions', id, {token: mySessionToken, name: acc.name, ts: Date.now()});
+// ── 관리자: 접속 승인 목록 ──
+function _startAdminAccessPoll() {
+  const btn = document.getElementById('btnAccessAdmin');
+  if (_adminAccessTimer) { clearInterval(_adminAccessTimer); _adminAccessTimer = null; }
+  if (!btn) return;
+  if (!currentUser || currentUser.manager !== 'ALL') { btn.style.display = 'none'; return; }
+  btn.style.display = '';
+  _adminPendingCount = -1;
+  const tick = async () => {
+    if (!currentUser || currentUser.manager !== 'ALL') return;
+    const list = await _FB.getAll('accessApprovals');
+    if (!list) return;
+    const pend = list.filter(x => x.status === 'pending').length;
+    document.getElementById('accessBadge').textContent = pend;
+    btn.style.background = pend ? '#fee2e2' : '';
+    btn.style.color = pend ? '#b91c1c' : '';
+    btn.style.borderColor = pend ? '#fca5a5' : '';
+    if (pend > 0 && _adminPendingCount === -1 && !document.getElementById('accessAdminModal')) openAccessAdmin();
+    _adminPendingCount = pend;
+    if (document.getElementById('accessAdminModal')) _renderAccessAdmin(list);
   };
-  if (window._fbReady) writeSession();
-  else document.addEventListener('fbReady', writeSession, {once:true});
-
-  showApp();
-  startSessionCheck();
+  tick();
+  _adminAccessTimer = setInterval(tick, 8000);
+}
+async function openAccessAdmin() {
+  if (!currentUser || currentUser.manager !== 'ALL') return;
+  if (document.getElementById('accessAdminModal')) return;
+  const ov = document.createElement('div');
+  ov.id = 'accessAdminModal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10001;display:flex;align-items:center;justify-content:center;';
+  ov.addEventListener('click', e => { if (e.target === ov) closeAccessAdmin(); });
+  const box = document.createElement('div');
+  box.id = 'accessAdminBox';
+  box.style.cssText = 'background:#fff;border-radius:16px;padding:22px;width:420px;max-width:94vw;max-height:80vh;overflow:auto;font-family:inherit;';
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  const list = await _FB.getAll('accessApprovals');
+  _renderAccessAdmin(list || []);
+}
+function closeAccessAdmin() {
+  const ov = document.getElementById('accessAdminModal');
+  if (ov) ov.remove();
+}
+function _renderAccessAdmin(list) {
+  const box = document.getElementById('accessAdminBox');
+  if (!box) return;
+  const now = Date.now();
+  const pend = list.filter(x => x.status === 'pending').sort((a, b) => (b.requestedAt || 0) - (a.requestedAt || 0));
+  const appr = list.filter(x => x.status === 'approved' && x.approvedUntil > now).sort((a, b) => (b.approvedUntil || 0) - (a.approvedUntil || 0));
+  box.textContent = '';
+  const mk = (tag, css, text) => { const e = document.createElement(tag); if (css) e.style.cssText = css; if (text != null) e.textContent = text; return e; };
+  const head = mk('div', 'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;');
+  head.appendChild(mk('div', 'font-size:16px;font-weight:800;color:#1a1d2e;', '🔔 접속 승인'));
+  const x = mk('button', 'border:none;background:none;font-size:20px;cursor:pointer;color:#6b7280;', '×');
+  x.onclick = closeAccessAdmin; head.appendChild(x);
+  box.appendChild(head);
+  const fmt = t => { const d = new Date(t); return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const row = (r, isPending) => {
+    const w = mk('div', 'border:1px solid #e5e7eb;border-radius:10px;padding:11px 12px;margin-bottom:8px;');
+    w.appendChild(mk('div', 'font-size:14px;font-weight:700;color:#1a1d2e;', r.name || r.userId));
+    w.appendChild(mk('div', 'font-size:12px;color:#6b7280;margin:2px 0 8px;', isPending
+      ? ('요청 ' + fmt(r.requestedAt || now) + ' · IP ' + (r.ip || '-'))
+      : ('~ ' + fmt(r.approvedUntil) + ' 까지 · IP ' + (r.ip || '-'))));
+    const bar = mk('div', 'display:flex;gap:8px;');
+    const setSt = async (patch) => {
+      try { await db.collection('accessApprovals').doc(r._id).set(patch, {merge: true}); }
+      catch(e) { alert('처리하지 못했습니다. 다시 시도해 주세요.'); return; }
+      const l = await _FB.getAll('accessApprovals'); _renderAccessAdmin(l || []);
+      _startAdminAccessPoll();
+    };
+    if (isPending) {
+      const ok = mk('button', 'flex:1;padding:8px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;font-family:inherit;', '승인 (24시간)');
+      ok.onclick = () => setSt({status: 'approved', approvedAt: Date.now(), approvedUntil: Date.now() + ACCESS_TTL_MS});
+      const no = mk('button', 'flex:1;padding:8px;border:none;border-radius:8px;background:#f3f4f6;color:#374151;font-weight:700;cursor:pointer;font-family:inherit;', '거절');
+      no.onclick = () => setSt({status: 'denied'});
+      bar.appendChild(ok); bar.appendChild(no);
+    } else {
+      const rv = mk('button', 'flex:1;padding:8px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:700;cursor:pointer;font-family:inherit;', '접속 해제');
+      rv.onclick = () => setSt({status: 'revoked', approvedUntil: 0});
+      bar.appendChild(rv);
+    }
+    w.appendChild(bar);
+    return w;
+  };
+  box.appendChild(mk('div', 'font-size:12px;font-weight:700;color:#b45309;margin:6px 0;', '승인 대기 (' + pend.length + ')'));
+  if (!pend.length) box.appendChild(mk('div', 'font-size:12px;color:#9ca3af;margin-bottom:8px;', '대기 중인 요청이 없습니다.'));
+  pend.forEach(r => box.appendChild(row(r, true)));
+  box.appendChild(mk('div', 'font-size:12px;font-weight:700;color:#16a34a;margin:12px 0 6px;', '승인된 기기 (' + appr.length + ')'));
+  if (!appr.length) box.appendChild(mk('div', 'font-size:12px;color:#9ca3af;', '승인된 기기가 없습니다.'));
+  appr.forEach(r => box.appendChild(row(r, false)));
 }
 
 // ── 중복 로그인 감지 ──
@@ -5190,6 +5454,9 @@ async function restoreFullBackup(input) {
 
 function doLogout() {
   if (_sessionCheckTimer) { clearInterval(_sessionCheckTimer); _sessionCheckTimer = null; }
+  if (_accessWatchTimer) { clearInterval(_accessWatchTimer); _accessWatchTimer = null; }
+  if (_adminAccessTimer) { clearInterval(_adminAccessTimer); _adminAccessTimer = null; }
+  const _am = document.getElementById('accessAdminModal'); if (_am) _am.remove();
   currentUser = null;
   currentUserId = null;
   mySessionToken = null;
