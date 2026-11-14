@@ -3369,6 +3369,7 @@ function applyRBulkDelete(){
   buildRColFilters();
   renderReal();
   showToast(`🗑 ${deleteCount}건 삭제 완료!`);
+  saveRealToFirebase();
 }
 
 function closeRBulkDelete(){
@@ -3462,6 +3463,7 @@ function applyRDedupe(){
   buildRColFilters();
   renderReal();
   showToast(`🧹 ${checked.length}건 삭제 완료!`);
+  saveRealToFirebase();
 }
 
 function closeRDedupe(){
@@ -4644,8 +4646,16 @@ function renderStats(){
   wrap.innerHTML = html;
 }
 
+// 고객관리 탭 스크롤 위치 기억 (다른 탭 갔다가 돌아와도 작업하던 위치 유지)
+var _crmScroll = null;
 function switchTab(tab) {
   setTimeout(()=>updateUndoBtn(tab), 100);
+  try {
+    if (currentTab === 'crm' && tab !== 'crm') {
+      const _w = document.getElementById('tblWrap');
+      if (_w) _crmScroll = {t: _w.scrollTop, l: _w.scrollLeft, y: window.pageYOffset};
+    }
+  } catch(e) {}
   currentTab = tab;
   try { localStorage.setItem('lastMainTab', tab); } catch(e) {}
   if(typeof updateMobileNav==='function') updateMobileNav(tab);
@@ -4663,6 +4673,13 @@ function switchTab(tab) {
   for(const [k,el] of Object.entries(screens)) {
     if(el) el.style.display = (k===tab) ? (k==='crm'?'':'block') : 'none';
   }
+  try {
+    if (tab === 'crm' && _crmScroll) {
+      const _w = document.getElementById('tblWrap');
+      if (_w) { _w.scrollTop = _crmScroll.t; _w.scrollLeft = _crmScroll.l; }
+      window.scrollTo(0, _crmScroll.y || 0);
+    }
+  } catch(e) {}
 
   // 탭 버튼 스타일
   ['tabMaemul','tabCRM','tabJournal','tabAdvert','tabReal','tabElevation','tabStats'].forEach(id => {
